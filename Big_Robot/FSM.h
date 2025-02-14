@@ -15,8 +15,7 @@ enum RobotState {
     MOVE_TO_SECOND,
     GO_HOME,
     PAUSE,
-    AVOID_OBSTACLE,
-    PREVIOUS_STATE
+    AVOID_OBSTACLE
 };
 
 class FSM {
@@ -27,6 +26,7 @@ public:
     
 private:
     RobotState state;
+    RobotState previousState;
     unsigned long startTime;
     unsigned long obstacle_treshold;
     bool isObstacleDetected();
