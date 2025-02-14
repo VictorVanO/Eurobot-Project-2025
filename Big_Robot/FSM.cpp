@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0) {}
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(10) {}
 
 void FSM::init() {
     initMotors();
@@ -11,8 +11,22 @@ void FSM::run() {
     handleState();
 }
 
+// Obstacle detection 10 cm in front of the robot
+bool FSM::isObstacleDetected() {
+    float distance = readDistance();
+    return (distance > 0 && distance < obstacle_treshold);
+}
+
 void FSM::handleState() {
     unsigned long currentTime = millis();
+
+    // Global check for obstacle
+    if (isObstacleDetected() && state != PAUSE) {
+        previousState = state;  // Save current state before pausing
+        state = PAUSE;
+        Serial.println("Obstacle detected ! Switching to PAUSE state.");
+        return;  // Stop execution and enter PAUSE state
+    }
 
     switch (state) {
         // Init state: Start timer
@@ -74,6 +88,10 @@ void FSM::handleState() {
 
         // PAUSE state: Robot stop moving.
         case PAUSE:
+            if (!isObstacleDetected()) {
+                Serial.println("No obstacle detected. Resuming previous state.");
+                state = previousState;  // Go back to the last state before PAUSE
+            }
             break;
             
         // Avoid Obstacle state: Avoid the obstacle, 

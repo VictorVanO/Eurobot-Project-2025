@@ -6,7 +6,7 @@
 // Define pin names
 #define PWM_2 4
 #define PWM_1 7
-#define DIR_2 A2
+#define DIR_2 5
 #define DIR_1 6
 
 // Function prototypes

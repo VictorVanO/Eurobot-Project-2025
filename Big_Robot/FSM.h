@@ -28,6 +28,8 @@ public:
 private:
     RobotState state;
     unsigned long startTime;
+    unsigned long obstacle_treshold;
+    bool isObstacleDetected();
     void handleState();
 };
 
