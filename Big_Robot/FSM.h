@@ -1,6 +1,9 @@
 #ifndef FSM_H
 #define FSM_H
 
+#include "Motors.h"
+#include "Ultrasonic.h"
+
 enum RobotState {
     INIT,
     MOVE_ARMS,

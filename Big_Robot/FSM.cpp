@@ -1,9 +1,10 @@
 #include "FSM.h"
 
-FSM::FSM() : state(IDLE), startTime(0) {}
+FSM::FSM() : state(INIT), startTime(0) {}
 
 void FSM::init() {
     initMotors();
+    initUltrasonic();
 }
 
 void FSM::run() {
@@ -39,31 +40,31 @@ void FSM::handleState() {
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
             sweepMotor(); // Run the motor sweep function
-            state = GRAB_MATERIALS
+            state = GRAB_MATERIALS;
             break;
         
         // Grab Materials state: Grab the materials to build the bleachers
         case GRAB_MATERIALS:
-            state = MOVE_TO_CONSTRUCTION
+            state = MOVE_TO_CONSTRUCTION;
             break;
         
         // Move To Construction: Move to the construction zone with materials.
         // Hardcoded path depending on position (first or second materials).
         case MOVE_TO_CONSTRUCTION:
-            state = BUILD_BLEACHER
+            state = BUILD_BLEACHER;
             break;
             
         // Build Bleacher state: Move arms and hands to build a bleacher
         case BUILD_BLEACHER:
             // After first bleacher is built
-            state = MOVE_TO_SECOND
+            state = MOVE_TO_SECOND;
             // After second bleacher is built
-            state = GO_HOME
+            state = GO_HOME;
             break;
         
         // Move To Second state: Move to the second materials spot
         case MOVE_TO_SECOND:
-            state = GRAB_MATERIALS
+            state = GRAB_MATERIALS;
             break;
             
         // Go Home state: Move to arrival zone. Pause for a few seconds when in front of PAMI.
