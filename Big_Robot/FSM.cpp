@@ -13,17 +13,32 @@ void FSM::run() {
 
 // Obstacle detection 10 cm in front of the robot
 bool FSM::isObstacleDetected() {
+    // Define sensor arrays (trig/echo pins)
+    const int trigPins[NUM_ULTRASONIC] = {trigPin1, trigPin2, trigPin3};
+    const int echoPins[NUM_ULTRASONIC] = {echoPin1, echoPin2, echoPin3};
+    
+    bool obstacleDetected = false;
+
+    Serial.print("Distances: ");
+    
+    // Loop through each sensor and read distance
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
-        float distance = readDistance(i);
+        float distance = readDistance(trigPins[i], echoPins[i]);
+
+        Serial.print("Sensor ");
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.print(distance);
+        Serial.print(" cm | ");
+
         if (distance > 0 && distance < obstacle_treshold) {
-            Serial.print("Obstacle detected by sensor ");
-            Serial.print(i);
-            Serial.print(" at distance: ");
-            Serial.println(distance);
-            return true;
+            Serial.print("[Obstacle Detected] ");
+            obstacleDetected = true;
         }
     }
-    return false;
+
+    Serial.println(); // New line for readability
+    return obstacleDetected;
 }
 
 
@@ -41,9 +56,8 @@ void FSM::handleState() {
     switch (state) {
         // Init state: Start timer
         case INIT:
-            if (startTime == 0){
-              startTime = millis();
-            }
+            if (startTime == 0) startTime = millis();
+            state = MOVE_TO_FIRST;
             // Start by moving arms. (For the tests, we start by moving in MOVE_TO_FIRST state)
             state = MOVE_TO_FIRST;
             break;
@@ -64,7 +78,7 @@ void FSM::handleState() {
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
             runMotors(127);
-            state = GRAB_MATERIALS;
+            // state = GRAB_MATERIALS;
             break;
         
         // Grab Materials state: Grab the materials to build the bleachers

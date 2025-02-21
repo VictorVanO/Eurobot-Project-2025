@@ -1,14 +1,19 @@
 #ifndef ULTRASONIC_H
 #define ULTRASONIC_H
 
-// Number of sensors
-#define NUM_ULTRASONIC 3  
+// Sensor 1
+const int trigPin1 = 22;
+const int echoPin1 = 24;
 
-// Define trig and echo pins for each sensor
-const int trigPins[NUM_ULTRASONIC] = {22, 26, 30};
-const int echoPins[NUM_ULTRASONIC] = {24, 28, 32};
+// Sensor 2
+const int trigPin2 = 26;
+const int echoPin2 = 28;
+
+// Sensor 3
+const int trigPin3 = 30;
+const int echoPin3 = 32;
 
 void initUltrasonic();
-float readDistance(int sensorIndex);
+float readDistance(int trigPin, int echoPin);
 
 #endif

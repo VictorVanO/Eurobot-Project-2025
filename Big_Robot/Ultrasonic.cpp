@@ -1,28 +1,28 @@
 #include "Ultrasonic.h"
 #include <Arduino.h>
 
-// Initialize all ultrasonic sensors
 void initUltrasonic() {
-    for (int i = 0; i < NUM_ULTRASONIC; i++) {
-        pinMode(trigPins[i], OUTPUT);
-        pinMode(echoPins[i], INPUT);
-    }
+    pinMode(trigPin1, OUTPUT);
+    pinMode(echoPin1, INPUT);
+
+    pinMode(trigPin2, OUTPUT);
+    pinMode(echoPin2, INPUT);
+
+    pinMode(trigPin3, OUTPUT);
+    pinMode(echoPin3, INPUT);
 }
 
-// Read distance from a specific sensor
-float readDistance(int sensorIndex) {
-    if (sensorIndex < 0 || sensorIndex >= NUM_ULTRASONIC) return -1;  // Invalid sensor index
-
+float readDistance(int trigPin, int echoPin) {
     float duration, distance;
 
-    digitalWrite(trigPins[sensorIndex], LOW);
+    digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
-    digitalWrite(trigPins[sensorIndex], HIGH);
+    digitalWrite(trigPin, HIGH);
     delayMicroseconds(10);
-    digitalWrite(trigPins[sensorIndex], LOW);
+    digitalWrite(trigPin, LOW);
 
-    duration = pulseIn(echoPins[sensorIndex], HIGH);
-    distance = (duration * 0.0343) / 2;  // Convert to cm
+    duration = pulseIn(echoPin, HIGH);
+    distance = (duration * 0.0343) / 2;
 
     return distance;
 }
