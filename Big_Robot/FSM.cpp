@@ -13,9 +13,19 @@ void FSM::run() {
 
 // Obstacle detection 10 cm in front of the robot
 bool FSM::isObstacleDetected() {
-    float distance = readDistance();
-    return (distance > 0 && distance < obstacle_treshold);
+    for (int i = 0; i < NUM_ULTRASONIC; i++) {
+        float distance = readDistance(i);
+        if (distance > 0 && distance < obstacle_treshold) {
+            Serial.print("Obstacle detected by sensor ");
+            Serial.print(i);
+            Serial.print(" at distance: ");
+            Serial.println(distance);
+            return true;
+        }
+    }
+    return false;
 }
+
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
@@ -53,7 +63,7 @@ void FSM::handleState() {
          
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
-            sweepMotor(); // Run the motor sweep function
+            runMotors(127);
             state = GRAB_MATERIALS;
             break;
         
@@ -88,6 +98,7 @@ void FSM::handleState() {
 
         // PAUSE state: Robot stop moving.
         case PAUSE:
+            stopMotors();
             if (!isObstacleDetected()) {
                 Serial.println("No obstacle detected. Resuming previous state.");
                 state = previousState;  // Go back to the last state before PAUSE
