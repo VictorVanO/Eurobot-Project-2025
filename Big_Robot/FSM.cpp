@@ -99,6 +99,7 @@ void FSM::handleState() {
         // PAUSE state: Robot stop moving.
         case PAUSE:
             stopMotors();
+            delay(5000);
             if (!isObstacleDetected()) {
                 Serial.println("No obstacle detected. Resuming previous state.");
                 state = previousState;  // Go back to the last state before PAUSE
