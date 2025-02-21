@@ -26,7 +26,8 @@ void FSM::handleState() {
               startTime = millis();
             }
             Serial.println("Robot state: Idle");
-            Serial.print("Waiting 5 seconds before starting.");
+            // Serial.print("Waiting 5 seconds before starting.");
+            Serial.print("Waiting %d seconds before starting.", timeoutDuration);
             sendMessage("Robot state: Idle");
             // After 5 seconds, the robot starts if there is no obstacle.
             if (currentTime - startTime >= timeoutDuration) {
