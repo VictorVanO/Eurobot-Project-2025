@@ -9,8 +9,11 @@
 #define DIR_2 5
 #define DIR_1 6
 
-// Function prototypes
 void initMotors();
+void runMotors(uint8_t speed);
+void turnLeft();
+void turnRight();
+void stopMotors();
 void sweepMotor();
 
 #endif

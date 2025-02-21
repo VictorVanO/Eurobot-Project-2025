@@ -7,6 +7,24 @@ void initMotors() {
     pinMode(DIR_2, OUTPUT);
 }
 
+void runMotors(uint8_t speed) {
+    digitalWrite(PWM_1, HIGH);
+    digitalWrite(PWM_2, HIGH);
+    delay(100);
+    analogWrite(DIR_1, speed);
+    analogWrite(DIR_2, speed);
+    delay(100);
+}
+
+void stopMotors() {
+    digitalWrite(PWM_1, HIGH);
+    digitalWrite(PWM_2, HIGH);
+    delay(100);
+    analogWrite(DIR_1, 0);
+    analogWrite(DIR_2, 0);
+    delay(100);
+}
+
 void sweepMotor() {
     digitalWrite(PWM_1, HIGH);
     digitalWrite(PWM_2, HIGH);
