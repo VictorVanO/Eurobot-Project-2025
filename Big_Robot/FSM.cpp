@@ -13,17 +13,12 @@ void FSM::run() {
 
 // Obstacle detection 10 cm in front of the robot
 bool FSM::isObstacleDetected() {
-    // Define sensor arrays (trig/echo pins)
-    const int trigPins[NUM_ULTRASONIC] = {trigPin1, trigPin2, trigPin3};
-    const int echoPins[NUM_ULTRASONIC] = {echoPin1, echoPin2, echoPin3};
-    
     bool obstacleDetected = false;
 
     Serial.print("Distances: ");
     
-    // Loop through each sensor and read distance
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
-        float distance = readDistance(trigPins[i], echoPins[i]);
+        float distance = readDistance(trigPins[i], echoPins[i]);  // Now works ✅
 
         Serial.print("Sensor ");
         Serial.print(i);
@@ -37,7 +32,7 @@ bool FSM::isObstacleDetected() {
         }
     }
 
-    Serial.println(); // New line for readability
+    Serial.println();
     return obstacleDetected;
 }
 
