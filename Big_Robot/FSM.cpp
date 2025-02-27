@@ -12,36 +12,53 @@ void FSM::run() {
 }
 
 // Obstacle detection 10 cm in front of the robot
-bool FSM::isObstacleDetected() {
-    bool obstacleDetected = false;
+// bool FSM::isObstacleDetected() {
+//     bool obstacleDetected = false;
 
-    Serial.print("Distances: ");
+//     Serial.print("Distances: ");
     
-    for (int i = 0; i < NUM_ULTRASONIC; i++) {
-        float distance = readDistance(trigPins[i], echoPins[i]);  // Now works ✅
+//     for (int i = 0; i < NUM_ULTRASONIC; i++) {
+//         float distance = readDistance(trigPins[i], echoPins[i]);
 
-        Serial.print("Sensor ");
-        Serial.print(i);
-        Serial.print(": ");
-        Serial.print(distance);
-        Serial.print(" cm | ");
+//         Serial.print("Sensor ");
+//         Serial.print(i);
+//         Serial.print(": ");
+//         Serial.print(distance);
+//         Serial.print(" cm | ");
 
-        if (distance > 0 && distance < obstacle_treshold) {
-            Serial.print("[Obstacle Detected] ");
-            obstacleDetected = true;
-        }
-    }
+//         if (distance > 0 && distance < obstacle_treshold) {
+//             Serial.print("[Obstacle Detected] ");
+//             obstacleDetected = true;
+//         }
+//     }
 
-    Serial.println();
-    return obstacleDetected;
-}
+//     Serial.println();
+//     return obstacleDetected;
+// }
 
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
+    bool obstacleDetected = false;
+
+    // Get ultrasonic distances
+    for (int i = 0; i < NUM_ULTRASONIC; i++) {
+        distance = readDistance(i)
+        Serial.print("Sensor ");
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.print(distance);
+        Serial.print(" cm.");
+        Serial.println()
+        if (distance > 0 && distance <= 10) {
+            obstacleDetected = true;
+        } else {
+            obstacleDetected = false;
+        }
+    }
 
     // Global check for obstacle
-    if (isObstacleDetected() && state != PAUSE) {
+    if (obstacleDetected && state != PAUSE) {
         previousState = state;  // Save current state before pausing
         state = PAUSE;
         Serial.println("Obstacle detected ! Switching to PAUSE state.");
@@ -109,10 +126,11 @@ void FSM::handleState() {
         case PAUSE:
             stopMotors();
             delay(5000);
-            if (!isObstacleDetected()) {
-                Serial.println("No obstacle detected. Resuming previous state.");
-                state = previousState;  // Go back to the last state before PAUSE
-            }
+            state = previousState;
+            // if (!isObstacleDetected()) {
+            //     Serial.println("No obstacle detected. Resuming previous state.");
+            //     state = previousState;  // Go back to the last state before PAUSE
+            // }
             break;
             
         // Avoid Obstacle state: Avoid the obstacle, 

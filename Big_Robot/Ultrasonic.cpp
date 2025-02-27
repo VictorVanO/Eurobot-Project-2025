@@ -2,18 +2,17 @@
 #include <Arduino.h>
 
 void initUltrasonic() {
-    pinMode(trigPin1, OUTPUT);
-    pinMode(echoPin1, INPUT);
-
-    pinMode(trigPin2, OUTPUT);
-    pinMode(echoPin2, INPUT);
-
-    pinMode(trigPin3, OUTPUT);
-    pinMode(echoPin3, INPUT);
+    for (int i = 0; i < NUM_ULTRASONIC; i++) {
+        pinMode(trigPins[i], OUTPUT);
+        pinMode(echoPins[i], INPUT);
+    }
 }
 
-float readDistance(int trigPin, int echoPin) {
+float readDistance(int sensorIndex) {
     float duration, distance;
+
+    trigPin = tringPins[sensorIndex];
+    echoPin = echoPins[sensorIndex];
 
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
