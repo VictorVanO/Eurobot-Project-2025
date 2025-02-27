@@ -4,16 +4,16 @@
 #include <Arduino.h>
 
 // Define pin names
-#define PWM_2 4
-#define PWM_1 7
-#define DIR_2 5
-#define DIR_1 6
+#define pwm_1 6
+#define dir_1 7
+#define pwm_2 4
+#define dir_2 5
 
 void initMotors();
-void runMotors(uint8_t speed);
-void turnLeft();
-void turnRight();
+void moveForward(int speed);
+void moveBackward(int speed);
+void turnLeft(int speed);
+void turnRight(int speed);
 void stopMotors();
-void sweepMotor();
 
 #endif

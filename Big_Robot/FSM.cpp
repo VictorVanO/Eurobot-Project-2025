@@ -11,37 +11,11 @@ void FSM::run() {
     handleState();
 }
 
-// Obstacle detection 10 cm in front of the robot
-// bool FSM::isObstacleDetected() {
-//     bool obstacleDetected = false;
-
-//     Serial.print("Distances: ");
-    
-//     for (int i = 0; i < NUM_ULTRASONIC; i++) {
-//         float distance = readDistance(trigPins[i], echoPins[i]);
-
-//         Serial.print("Sensor ");
-//         Serial.print(i);
-//         Serial.print(": ");
-//         Serial.print(distance);
-//         Serial.print(" cm | ");
-
-//         if (distance > 0 && distance < obstacle_treshold) {
-//             Serial.print("[Obstacle Detected] ");
-//             obstacleDetected = true;
-//         }
-//     }
-
-//     Serial.println();
-//     return obstacleDetected;
-// }
-
-
 void FSM::handleState() {
     unsigned long currentTime = millis();
     bool obstacleDetected = false;
 
-    // Get ultrasonic distances
+    // Get ultrasonics' distances and check for obstacle below 10cm
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
         float distance = readDistance(i);
         Serial.print("Sensor ");
@@ -50,18 +24,18 @@ void FSM::handleState() {
         Serial.print(distance);
         Serial.print(" cm.");
         Serial.println();
-        if (distance > 0 && distance <= 10) {
+        if (distance > 0 && distance <= obstacle_treshold) {
             obstacleDetected = true;
         } else {
             obstacleDetected = false;
         }
     }
 
-    // Global check for obstacle
+    // Check for obstacle
     if (obstacleDetected && state != PAUSE) {
         previousState = state;  // Save current state before pausing
         state = PAUSE;
-        Serial.println("Obstacle detected ! Switching to PAUSE state.");
+        Serial.println("Obstacle detected !!! Switching to PAUSE state.");
         return;  // Stop execution and enter PAUSE state
     }
 
@@ -69,7 +43,6 @@ void FSM::handleState() {
         // Init state: Start timer
         case INIT:
             if (startTime == 0) startTime = millis();
-            state = MOVE_TO_FIRST;
             // Start by moving arms. (For the tests, we start by moving in MOVE_TO_FIRST state)
             state = MOVE_TO_FIRST;
             break;
@@ -89,8 +62,17 @@ void FSM::handleState() {
          
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
-            runMotors(127);
-            // state = GRAB_MATERIALS;
+            // Test: Move Forward robot in some directions for some time.
+            delay(3000)
+            moveForward(220);
+            delay(3000);
+            turnRight(220);
+            delay(2000);
+            moveForward(220);
+            delay(3000);
+            stopMotors();
+            delay(10000);
+            state = INIT;
             break;
         
         // Grab Materials state: Grab the materials to build the bleachers
@@ -125,12 +107,11 @@ void FSM::handleState() {
         // PAUSE state: Robot stop moving.
         case PAUSE:
             stopMotors();
-            delay(500);
-            state = previousState;
-            // if (!isObstacleDetected()) {
-            //     Serial.println("No obstacle detected. Resuming previous state.");
-            //     state = previousState;  // Go back to the last state before PAUSE
-            // }
+            delay(5000);
+            if (!obstacleDetected) {
+                Serial.println("No obstacle detected. Resuming previous state.");
+                state = previousState;  // Go back to the last state before PAUSE
+            }
             break;
             
         // Avoid Obstacle state: Avoid the obstacle, 
