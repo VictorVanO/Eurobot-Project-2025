@@ -63,7 +63,7 @@ void FSM::handleState() {
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
             // Test: Move Forward robot in some directions for some time.
-            delay(3000)
+            delay(3000);
             moveForward(220);
             delay(3000);
             turnRight(220);
