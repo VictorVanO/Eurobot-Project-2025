@@ -43,13 +43,13 @@ void FSM::handleState() {
 
     // Get ultrasonic distances
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
-        distance = readDistance(i)
+        float distance = readDistance(i);
         Serial.print("Sensor ");
         Serial.print(i);
         Serial.print(": ");
         Serial.print(distance);
         Serial.print(" cm.");
-        Serial.println()
+        Serial.println();
         if (distance > 0 && distance <= 10) {
             obstacleDetected = true;
         } else {

@@ -11,8 +11,8 @@ void initUltrasonic() {
 float readDistance(int sensorIndex) {
     float duration, distance;
 
-    trigPin = tringPins[sensorIndex];
-    echoPin = echoPins[sensorIndex];
+    int trigPin = trigPins[sensorIndex];
+    int echoPin = echoPins[sensorIndex];
 
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
