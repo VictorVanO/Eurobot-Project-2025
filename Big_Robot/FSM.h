@@ -1,8 +1,10 @@
 #ifndef FSM_H
 #define FSM_H
 
+#include <Arduino.h>
 #include "Motors.h"
 #include "Ultrasonic.h"
+#include "LCD.h"
 
 #define NUM_ULTRASONIC 3  // Number of ultrasonic sensors
 
@@ -23,6 +25,7 @@ enum RobotState {
 class FSM {
 public:
     FSM();
+    ~FSM();
     void init();
     void run();
     
@@ -32,9 +35,7 @@ private:
     unsigned long startTime;
     unsigned long obstacle_treshold;
 
-    // Sensor pins as class variables
-    const int trigPins[NUM_ULTRASONIC] = {22, 26, 30};  
-    const int echoPins[NUM_ULTRASONIC] = {24, 28, 32};  
+    LCD* lcd;
 
     bool isObstacleDetected();
     void handleState();

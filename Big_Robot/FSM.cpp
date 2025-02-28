@@ -1,10 +1,17 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(10) {}
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(10) {
+    lcd = new LCD();
+}
+
+FSM::~FSM() {
+    delete lcd;
+}
 
 void FSM::init() {
     initMotors();
     initUltrasonic();
+    lcd->init();
 }
 
 void FSM::run() {
@@ -14,6 +21,7 @@ void FSM::run() {
 void FSM::handleState() {
     unsigned long currentTime = millis();
     bool obstacleDetected = false;
+    int bleachersNumbers = 0;
 
     // Get ultrasonics' distances and check for obstacle below 10cm
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
@@ -42,6 +50,12 @@ void FSM::handleState() {
     switch (state) {
         // Init state: Start timer
         case INIT:
+            lcd->clear();
+            lcd->printLine(0, "INIT LCD");
+            lcd->printLine(1, "Starting robot...");
+            lcd->printLine(2, "Initializing");
+            lcd->printLine(3, "systems...");
+
             if (startTime == 0) startTime = millis();
             // Start by moving arms. (For the tests, we start by moving in MOVE_TO_FIRST state)
             state = MOVE_TO_FIRST;
@@ -62,40 +76,53 @@ void FSM::handleState() {
          
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
-            // Test: Move Forward robot in some directions for some time.
-            delay(3000);
-            moveForward(220);
-            delay(3000);
-            turnRight(220);
             delay(2000);
             moveForward(220);
-            delay(3000);
-            stopMotors();
-            delay(10000);
-            state = INIT;
+            delay(2500);
+            state = GRAB_MATERIALS;
             break;
         
         // Grab Materials state: Grab the materials to build the bleachers
         case GRAB_MATERIALS:
+            stopMotors();
             state = MOVE_TO_CONSTRUCTION;
             break;
         
         // Move To Construction: Move to the construction zone with materials.
         // Hardcoded path depending on position (first or second materials).
         case MOVE_TO_CONSTRUCTION:
+            // Path from first bleacher
+            if (bleachersNumbers == 0) {
+                turnRight(220);
+                delay(3000);
+                moveForward(220);
+                delay(2000);
+            } else {
+                stopMotors();
+            }
+            // Path from second bealcher
+            // is in construction zone
             state = BUILD_BLEACHER;
             break;
             
         // Build Bleacher state: Move arms and hands to build a bleacher
         case BUILD_BLEACHER:
-            // After first bleacher is built
-            state = MOVE_TO_SECOND;
-            // After second bleacher is built
-            state = GO_HOME;
+            bleachersNumbers++;
+            if (bleachersNumbers == 1) {
+                // After first bleacher is built
+                state = MOVE_TO_SECOND;
+            } else {
+                // After second bleacher is built
+                state = GO_HOME;
+            }
             break;
         
         // Move To Second state: Move to the second materials spot
         case MOVE_TO_SECOND:
+            turnLeft(220);
+            delay(3000);
+            moveForward(220);
+            delay(2000);
             state = GRAB_MATERIALS;
             break;
             
