@@ -28,6 +28,7 @@ public:
     ~FSM();
     void init();
     void run();
+    bool isObstacleDetected();
     
 private:
     RobotState state;

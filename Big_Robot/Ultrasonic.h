@@ -4,8 +4,8 @@
 // Define the number of sensors
 #define NUM_ULTRASONIC 3
 
-const int trigPins[NUM_ULTRASONIC] = {9, 22, 26};
-const int echoPins[NUM_ULTRASONIC] = {10, 24, 28};
+const int trigPins[NUM_ULTRASONIC] = {9, 22, 24};
+const int echoPins[NUM_ULTRASONIC] = {10, 23, 25};
 
 void initUltrasonic();
 float readDistance(int sensorIndex);

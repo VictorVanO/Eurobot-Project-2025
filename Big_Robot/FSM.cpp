@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(10) {
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(5) {
     lcd = new LCD();
 }
 
@@ -18,11 +18,7 @@ void FSM::run() {
     handleState();
 }
 
-void FSM::handleState() {
-    unsigned long currentTime = millis();
-    bool obstacleDetected = false;
-    bool secondIsBuilt = false;
-
+bool FSM::isObstacleDetected() {
     // Get ultrasonics' distances and check for obstacle below 10cm
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
         float distance = readDistance(i);
@@ -32,15 +28,20 @@ void FSM::handleState() {
         Serial.print(distance);
         Serial.print(" cm.");
         Serial.println();
+
         if (distance > 0 && distance <= obstacle_treshold) {
-            obstacleDetected = true;
-        } else {
-            obstacleDetected = false;
+            return true; // Obstacle detected
         }
     }
+    return false; // No obstacle detected
+}
+
+void FSM::handleState() {
+    unsigned long currentTime = millis();
+    bool secondIsBuilt = false;
 
     // Check for obstacle
-    if (obstacleDetected && state != PAUSE) {
+    if (isObstacleDetected() && state != PAUSE && state != AVOID_OBSTACLE) {
         previousState = state;  // Save current state before pausing
         state = PAUSE;
         Serial.println("Obstacle detected !!! Switching to PAUSE state.");
@@ -152,14 +153,55 @@ void FSM::handleState() {
             lcd->printLine(1, "Motors stopped");
             stopMotors();
             delay(5000);
-            if (!obstacleDetected) {
-                Serial.println("No obstacle detected. Resuming previous state.");
+            if (!isObstacleDetected()) {
+                lcd->clear();
+                lcd->printLine(0, "No obstacle");
+                lcd->printLine(1, "Resuming prev.");
+                Serial.println("No more obstacle detected. Resuming previous state.");
                 state = previousState;  // Go back to the last state before PAUSE
+            } else {
+                state = AVOID_OBSTACLE;
             }
             break;
             
-        // Avoid Obstacle state: Avoid the obstacle, 
+        // Avoid Obstacle state: Avoid the obstacle by turning left or right, then going back on path
         case AVOID_OBSTACLE:
+            lcd->clear();
+            lcd->printLine(0, "Avoiding");
+            lcd->printLine(1, "Obstacle...");
+            
+            // First back up a bit to create space
+            moveBackward(200);
+            delay(1000);
+            stopMotors();
+            
+            // Turn right to try to go around
+            turnRight(200);
+            delay(1500);
+            stopMotors();
+            
+            // Check if path is clear
+            if (!isObstacleDetected()) {
+                // Move forward to go around obstacle
+                moveForward(200);
+                delay(1500);
+                stopMotors();
+                
+                // Turn left to get back on path
+                turnLeft(200);
+                delay(1500);
+                stopMotors();
+                
+                // Resume previous state
+                state = previousState;
+            } else {
+                // Try turning left instead
+                turnLeft(200);
+                delay(3000); // Turn more to try another direction
+                stopMotors();
+                
+                // Stay in AVOID_OBSTACLE state and try again next iteration
+            }
             break;
     }
 }
