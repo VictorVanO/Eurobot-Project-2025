@@ -21,7 +21,7 @@ void FSM::run() {
 void FSM::handleState() {
     unsigned long currentTime = millis();
     bool obstacleDetected = false;
-    int bleachersNumbers = 0;
+    bool secondIsBuilt = false;
 
     // Get ultrasonics' distances and check for obstacle below 10cm
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
@@ -53,10 +53,9 @@ void FSM::handleState() {
             lcd->clear();
             lcd->printLine(0, "INIT LCD");
             lcd->printLine(1, "Starting robot...");
-            lcd->printLine(2, "Initializing");
-            lcd->printLine(3, "systems...");
 
             if (startTime == 0) startTime = millis();
+
             // Start by moving arms. (For the tests, we start by moving in MOVE_TO_FIRST state)
             state = MOVE_TO_FIRST;
             break;
@@ -76,6 +75,9 @@ void FSM::handleState() {
          
         // Move To First state: Hardcoded path to the first materials
         case MOVE_TO_FIRST:
+            lcd->clear();
+            lcd->printLine(0, "Moving to");
+            lcd->printLine(1, "first bleacher");
             delay(2000);
             moveForward(220);
             delay(2500);
@@ -84,6 +86,9 @@ void FSM::handleState() {
         
         // Grab Materials state: Grab the materials to build the bleachers
         case GRAB_MATERIALS:
+            lcd->clear();
+            lcd->printLine(0, "Grabbing");
+            lcd->printLine(1, "Materials");
             stopMotors();
             state = MOVE_TO_CONSTRUCTION;
             break;
@@ -91,8 +96,11 @@ void FSM::handleState() {
         // Move To Construction: Move to the construction zone with materials.
         // Hardcoded path depending on position (first or second materials).
         case MOVE_TO_CONSTRUCTION:
+            lcd->clear();
+            lcd->printLine(0, "Moving to");
+            lcd->printLine(1, "construction");
             // Path from first bleacher
-            if (bleachersNumbers == 0) {
+            if (!secondIsBuilt) {
                 turnRight(220);
                 delay(3000);
                 moveForward(220);
@@ -107,8 +115,9 @@ void FSM::handleState() {
             
         // Build Bleacher state: Move arms and hands to build a bleacher
         case BUILD_BLEACHER:
-            bleachersNumbers++;
-            if (bleachersNumbers == 1) {
+            lcd->clear();
+            lcd->printLine(0, "Building...");
+            if (!secondIsBuilt) {
                 // After first bleacher is built
                 state = MOVE_TO_SECOND;
             } else {
@@ -119,6 +128,9 @@ void FSM::handleState() {
         
         // Move To Second state: Move to the second materials spot
         case MOVE_TO_SECOND:
+            lcd->clear();
+            lcd->printLine(0, "Moving to");
+            lcd->printLine(1, "second bleacher");
             turnLeft(220);
             delay(3000);
             moveForward(220);
@@ -128,11 +140,16 @@ void FSM::handleState() {
             
         // Go Home state: Move to arrival zone. Pause for a few seconds when in front of PAMI.
         case GO_HOME:
-            state = PAUSE;
+            lcd->clear();
+            lcd->printLine(0, "Going Home...");
+            lcd->printLine(1, ":)");
             break;
 
         // PAUSE state: Robot stop moving.
         case PAUSE:
+            lcd->clear();
+            lcd->printLine(0, "In PAUSE state");
+            lcd->printLine(1, "Motors stopped");
             stopMotors();
             delay(5000);
             if (!obstacleDetected) {
