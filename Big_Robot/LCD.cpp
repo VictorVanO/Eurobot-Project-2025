@@ -17,8 +17,8 @@ void LCD::init() {
     lcd->setCursor(3, 0);
     lcd->print("Spice Bot");
     lcd->setCursor(2, 1);
-    lcd->print("Operationnel");
-    delay(2000); // Display startup message for 2 seconds
+    lcd->print("Démarrage...");
+    delay(1000); // Display startup message for 2 seconds
 }
 
 void LCD::clear() {

@@ -19,7 +19,8 @@ enum RobotState {
     MOVE_TO_SECOND,
     GO_HOME,
     PAUSE,
-    AVOID_OBSTACLE
+    AVOID_OBSTACLE,
+    TESTS_STATE
 };
 
 class FSM {
@@ -28,18 +29,25 @@ public:
     ~FSM();
     void init();
     void run();
-    bool isObstacleDetected();
     
 private:
     RobotState state;
     RobotState previousState;
     unsigned long startTime;
     unsigned long obstacle_treshold;
+    bool secondIsBuilt;
+
+    bool isMoving;
+    unsigned long moveStartTime;
+    unsigned long moveDuration;
+    int movementStep;
 
     LCD* lcd;
 
     bool isObstacleDetected();
     void handleState();
+    void startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration);
+    void handleMovementCompletion();
 };
 
 #endif
