@@ -6,7 +6,7 @@
 #include "Ultrasonic.h"
 #include "LCD.h"
 
-#define NUM_ULTRASONIC 3  // Number of ultrasonic sensors
+// #define NUM_ULTRASONIC 3  // Number of ultrasonic sensors
 
 enum RobotState {
     INIT,

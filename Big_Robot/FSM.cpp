@@ -46,6 +46,7 @@ bool FSM::isObstacleDetected() {
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
+    bool armsFullyExtended = false;
 
     // Always check for obstacles, even during movements
     if (isMoving) {
@@ -91,20 +92,32 @@ void FSM::handleState() {
             if (startTime == 0) startTime = millis();
 
             // Start by moving arms. (For the tests, we start by moving in MOVE_TO_FIRST state)
+            // state = MOVE_ARMS;
             state = MOVE_TO_FIRST;
             movementStep = 0;
             break;
 
         // Move Arms state: Move the arms to fully extend the banner
         case MOVE_ARMS:
-            // When arms are fully extended, change state to open hands
-            state = OPEN_HANDS;
-            // If arms were fully extended, move them back to initial extension width. Then start moving
-            state = MOVE_TO_FIRST;
+            lcd->printLine(0, "Moving");
+            lcd->printLine(1, "arms...");
+            delay(1000);
+            if (!armsFullyExtended) {
+                // Fully extend arms, then change state to open hands to release the banner
+                armsFullyExtended = true;
+                state = OPEN_HANDS;
+                break;
+            } else {
+                // If arms were fully extended, move them back to initial extension width. Then start moving
+                state = MOVE_TO_FIRST;
+            }
             break;
             
         // Open Hands state: Open hands to release the banner on the table & move the arms back to normal extension
         case OPEN_HANDS:
+            lcd->printLine(0, "Opening");
+            lcd->printLine(1, "hands...");
+            delay(1000);
             state = MOVE_ARMS;
             break;
          
@@ -114,7 +127,7 @@ void FSM::handleState() {
             if (!isMoving) {
                 lcd->printLine(0, "Moving to");
                 lcd->printLine(1, "first bleacher");
-                startTimedMovement(moveForward, 220, 2500);
+                startTimedMovement(moveForward, 185, 1000);
             }
             break;
         
@@ -140,10 +153,10 @@ void FSM::handleState() {
                 if (!secondIsBuilt) {
                     if (movementStep == 0) {
                         // First step - turn right
-                        startTimedMovement(turnRight, 220, 3000);
+                        startTimedMovement(turnRight, 185, 500);
                     } else if (movementStep == 1) {
                         // Second step - move forward
-                        startTimedMovement(moveForward, 220, 2000);
+                        startTimedMovement(moveForward, 185, 1000);
                     }
                     // Steps are incremented in handleMovementCompletion
                 } else {
@@ -158,22 +171,28 @@ void FSM::handleState() {
             lcd->printLine(0, "Building...");
             if (!secondIsBuilt) {
                 // After first bleacher is built
+                secondIsBuilt = true;
                 state = MOVE_TO_SECOND;
+                movementStep = 0;
             } else {
                 // After second bleacher is built
                 state = GO_HOME;
+                movementStep = 0;
             }
             break;
         
         // Move To Second state: Move to the second materials spot
         case MOVE_TO_SECOND:
-            lcd->printLine(0, "Moving to");
-            lcd->printLine(1, "second bleacher");
-            turnLeft(220);
-            delay(3000);
-            moveForward(220);
-            delay(2000);
-            state = GRAB_MATERIALS;
+            if (!isMoving) {
+                lcd->printLine(0, "Moving to");
+                lcd->printLine(1, "second bleacher");
+                
+                if (movementStep == 0) {
+                    startTimedMovement(turnLeft, 185, 500);
+                } else if (movementStep == 1) {
+                    startTimedMovement(moveForward, 185, 500);
+                }
+            }
             break;
             
         // Go Home state: Move to arrival zone. Pause for a few seconds when in front of PAMI.
@@ -181,70 +200,69 @@ void FSM::handleState() {
             if (!isMoving) {
                 lcd->printLine(0, "Going Home...");
                 lcd->printLine(1, ":)");
-                startTimedMovement(moveForward, 220, 2000);
+                startTimedMovement(moveForward, 185, 1000);
+            } else {
+                stopMotors();
             }
             break;
 
-        // PAUSE state: Robot stop moving.
+        // PAUSE state: Robot stops moving.
         case PAUSE:
             lcd->printLine(0, "In PAUSE state");
             lcd->printLine(1, "Motors stopped");
-            stopMotors();
-            delay(5000);
-            if (!isObstacleDetected()) {
-                lcd->printLine(0, "No obstacle");
-                lcd->printLine(1, "Resuming prev.");
-                Serial.println("No more obstacle detected. Resuming previous state.");
-                state = previousState;  // Go back to the last state before PAUSE
-            } else {
-                state = AVOID_OBSTACLE;
+            
+            // Non-blocking pause check
+            if (!isMoving) {
+                startTimedMovement(stopMotors, 0, 2000); // Wait for 2 seconds
+            } else if (!isMoving) {
+                // Pause time complete, check for obstacles again
+                if (!isObstacleDetected()) {
+                    Serial.println("No obstacle detected. Resuming previous state.");
+                    state = previousState;
+                } else {
+                    state = AVOID_OBSTACLE;
+                    movementStep = 0;
+                }
             }
             break;
             
         // Avoid Obstacle state: Avoid the obstacle by turning left or right, then going back on path
         case AVOID_OBSTACLE:
-            lcd->printLine(0, "Avoiding");
-            lcd->printLine(1, "Obstacle...");
-            
-            // First back up a bit to create space
-            moveBackward(200);
-            delay(1000);
-            stopMotors();
-            
-            // Turn right to try to go around
-            turnRight(200);
-            delay(1500);
-            stopMotors();
-            
-            // Check if path is clear
-            if (!isObstacleDetected()) {
-                // Move forward to go around obstacle
-                moveForward(200);
-                delay(1500);
-                stopMotors();
+            if (!isMoving) {
+                lcd->clear();
+                lcd->printLine(0, "Avoiding");
+                lcd->printLine(1, "Obstacle");
                 
-                // Turn left to get back on path
-                turnLeft(200);
-                delay(1500);
-                stopMotors();
-                
-                // Resume previous state
-                state = previousState;
-            } else {
-                // Try turning left instead
-                turnLeft(200);
-                delay(3000); // Turn more to try another direction
-                stopMotors();
-                
-                // Stay in AVOID_OBSTACLE state and try again next iteration
+                if (movementStep == 0) {
+                    // First back up a bit
+                    startTimedMovement(moveBackward, 200, 1000);
+                } else if (movementStep == 1) {
+                    // Turn right to try to go around
+                    startTimedMovement(turnRight, 200, 1500);
+                } else if (movementStep == 2) {
+                    // Check if path is clear
+                    if (!isObstacleDetected()) {
+                        // Move forward
+                        startTimedMovement(moveForward, 200, 1500);
+                    } else {
+                        // Path not clear, try turning more
+                        startTimedMovement(turnRight, 200, 1500);
+                        // Stay in same step to try again
+                        movementStep = 1;
+                        return;
+                    }
+                } else if (movementStep == 3) {
+                    // Turn left to get back on path
+                    startTimedMovement(turnLeft, 200, 1500);
+                } else if (movementStep == 4) {
+                    // Return to previous state
+                    state = previousState;
+                    movementStep = 0;
+                }
             }
-            break;
-        case TESTS_STATE:
-            // Use this state for short tests
             break;
     }
 }
-
 
 void FSM::handleMovementCompletion() {
     // Called when a timed movement completes
