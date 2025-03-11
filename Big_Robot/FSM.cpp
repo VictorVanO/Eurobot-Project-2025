@@ -127,7 +127,7 @@ void FSM::handleState() {
             if (!isMoving) {
                 lcd->printLine(0, "Moving to");
                 lcd->printLine(1, "first bleacher");
-                startTimedMovement(moveForward, 185, 1000);
+                startTimedMovement(moveForward, 185, 250);
             }
             break;
         
@@ -153,10 +153,10 @@ void FSM::handleState() {
                 if (!secondIsBuilt) {
                     if (movementStep == 0) {
                         // First step - turn right
-                        startTimedMovement(turnRight, 185, 500);
+                        startTimedMovement(turnRight, 185, 120);
                     } else if (movementStep == 1) {
                         // Second step - move forward
-                        startTimedMovement(moveForward, 185, 1000);
+                        startTimedMovement(moveForward, 185, 500);
                     }
                     // Steps are incremented in handleMovementCompletion
                 } else {
@@ -188,7 +188,7 @@ void FSM::handleState() {
                 lcd->printLine(1, "second bleacher");
                 
                 if (movementStep == 0) {
-                    startTimedMovement(turnLeft, 185, 500);
+                    startTimedMovement(turnLeft, 185, 100);
                 } else if (movementStep == 1) {
                     startTimedMovement(moveForward, 185, 500);
                 }
