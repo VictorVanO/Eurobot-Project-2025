@@ -1,5 +1,5 @@
 #include "FSM.h"
-#include <ServoEasing.h>
+#include "ServoEasing.hpp"
 
 FSM fsm;
 

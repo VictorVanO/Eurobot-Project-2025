@@ -42,6 +42,7 @@ private:
     unsigned long moveStartTime;
     unsigned long moveDuration;
     int movementStep;
+    bool armsFullyExtended;
 
     LCD* lcd;
     ServoArms* arms;

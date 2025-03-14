@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(5), secondIsBuilt(false),
+FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(5), secondIsBuilt(false), armsFullyExtended(false),
                 isMoving(false), moveStartTime(0), moveDuration(0), movementStep(0) {
     lcd = new LCD();
     arms = new ServoArms();
@@ -49,7 +49,6 @@ bool FSM::isObstacleDetected() {
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
-    bool armsFullyExtended = false;
 
     // Always check for obstacles, even during movements
     if (isMoving) {
@@ -89,6 +88,7 @@ void FSM::handleState() {
     switch (state) {
         // Init state: Start timer
         case INIT:
+            Serial.println("State: INIT");
             lcd->printLine(0, "INIT LCD");
             lcd->printLine(1, "Starting robot...");
 
@@ -102,9 +102,10 @@ void FSM::handleState() {
 
         // Move Arms state: Move the arms to fully extend the banner
         case MOVE_ARMS:
+            Serial.println("State: Move Arms");
             lcd->printLine(0, "Moving");
             lcd->printLine(1, "arms...");
-            if (!armsFullyExtended) {
+            if (armsFullyExtended != true) {
                 // Fully extend arms, then change state to open hands to release the banner
                 arms->extendArms();
                 delay(2000);
@@ -119,6 +120,7 @@ void FSM::handleState() {
             
         // Open Hands state: Open hands to release the banner on the table & move the arms back to normal extension
         case OPEN_HANDS:
+            Serial.println("State: Open Hands");
             lcd->printLine(0, "Opening");
             lcd->printLine(1, "hands...");
             arms->openHands(2);
@@ -138,6 +140,7 @@ void FSM::handleState() {
         
         // Grab Materials state: Grab the materials to build the bleachers
         case GRAB_MATERIALS:
+            Serial.println("State: Grab Materials");
             lcd->printLine(0, "Grabbing");
             lcd->printLine(1, "Materials");
             stopMotors();
