@@ -5,6 +5,7 @@
 #include "Motors.h"
 #include "Ultrasonic.h"
 #include "LCD.h"
+#include "ServoArms.h"
 
 // #define NUM_ULTRASONIC 3  // Number of ultrasonic sensors
 
@@ -43,6 +44,7 @@ private:
     int movementStep;
 
     LCD* lcd;
+    ServoArms* arms;
 
     bool isObstacleDetected();
     void handleState();

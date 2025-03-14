@@ -3,16 +3,19 @@
 FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(5), secondIsBuilt(false),
                 isMoving(false), moveStartTime(0), moveDuration(0), movementStep(0) {
     lcd = new LCD();
+    arms = new ServoArms();
 }
 
 FSM::~FSM() {
     delete lcd;
+    delete arms;
 }
 
 void FSM::init() {
     initMotors();
     initUltrasonic();
     lcd->init();
+    arms->init();
 }
 
 void FSM::run() {
@@ -92,8 +95,8 @@ void FSM::handleState() {
             if (startTime == 0) startTime = millis();
 
             // Start by moving arms. (For the tests, we start by moving in MOVE_TO_FIRST state)
-            // state = MOVE_ARMS;
-            state = MOVE_TO_FIRST;
+            state = MOVE_ARMS;
+            // state = MOVE_TO_FIRST;
             movementStep = 0;
             break;
 
@@ -101,14 +104,15 @@ void FSM::handleState() {
         case MOVE_ARMS:
             lcd->printLine(0, "Moving");
             lcd->printLine(1, "arms...");
-            delay(1000);
             if (!armsFullyExtended) {
                 // Fully extend arms, then change state to open hands to release the banner
+                arms->extendArms();
+                delay(2000);
                 armsFullyExtended = true;
                 state = OPEN_HANDS;
-                break;
             } else {
                 // If arms were fully extended, move them back to initial extension width. Then start moving
+                arms->retractArms();
                 state = MOVE_TO_FIRST;
             }
             break;
@@ -117,7 +121,8 @@ void FSM::handleState() {
         case OPEN_HANDS:
             lcd->printLine(0, "Opening");
             lcd->printLine(1, "hands...");
-            delay(1000);
+            arms->openHands(2);
+            delay(2000);
             state = MOVE_ARMS;
             break;
          
@@ -136,6 +141,8 @@ void FSM::handleState() {
             lcd->printLine(0, "Grabbing");
             lcd->printLine(1, "Materials");
             stopMotors();
+            arms->grabMaterials();
+            delay(2000);
             state = MOVE_TO_CONSTRUCTION;
             movementStep = 0;
             break;

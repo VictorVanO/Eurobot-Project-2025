@@ -1,4 +1,5 @@
 #include "FSM.h"
+#include <ServoEasing.h>
 
 FSM fsm;
 
