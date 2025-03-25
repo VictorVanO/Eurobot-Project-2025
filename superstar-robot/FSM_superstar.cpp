@@ -22,7 +22,8 @@ void FSM::init() {
     state = IDLE; 
     startTime = millis();
     globalTimer = millis();
-    directionTimer = millis();
+    obstacleStart = millis();
+    obstacleTotalTime = 0;
 }
 
 // Exécution de la FSM
@@ -50,7 +51,7 @@ void FSM::handleState() {
     Serial.println(" cm");
 
 
-    if (millis() - globalTimer >= 20000) {
+    if (millis() - globalTimer >= 20000 && state != PARTY_STATE) { //A changer parr après 
         Serial.println("Temps écoulé ! Arrêt complet.");
         state = PARTY_STATE;
     }
@@ -66,33 +67,42 @@ void FSM::handleState() {
             break;
 
         case MOVE_FORWARD_STATE:
-            if (millis() - startTime < 5000) {
+            if (millis() - startTime - obstacleTotalTime < 5000) {
                 Serial.println("État : AVANCER");
                 goForward();
-            } else if (millis() - startTime < 7000) {
+            } 
+            
+            else if (millis() - startTime - obstacleTotalTime < 7000) {
                 Serial.println("État : TOURNER À DROITE");
                 setMotorsSpeed(motorSpeed1);
                 turnRight();
-            } else {
+            } 
+            
+            else if (millis() - startTime - obstacleTotalTime <= 8500) {
                 Serial.println("État : REPARTIR TOUT DROIT");
                 goForward();
                 setMotorsSpeed(motorSpeed2);
             }
+
+            else {
+                Serial.println("Fin de la séquence");
+                state = PARTY_STATE;
+            }
               
             if (distance1 < 7 || distance2 < 7) { 
+                obstacleStart = millis();
                 state = AVOID_OBSTACLE_STATE;
             }
 
-            if (millis() - startTime >= 8500) {
-              state = PARTY_STATE;
-            }
+            
             break;
 
         case AVOID_OBSTACLE_STATE:
             stopMotors();
-            delay(500);  
+            delay(500);
 
             if (distance1 >= 7 && distance2 >= 7) {  
+                obstacleTotalTime += (millis() - obstacleStart);
                 state = MOVE_FORWARD_STATE;
             }
             break;

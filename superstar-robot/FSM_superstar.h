@@ -26,7 +26,9 @@ private:
     RobotState state;
     unsigned long startTime;
     unsigned long globalTimer;
-    unsigned long directionTimer; 
+    unsigned long directionTimer;
+    unsigned long obstacleStart;
+    unsigned long obstacleTotalTime;
     int motorSpeed;
     int motorSpeed1;
     int motorSpeed2;
