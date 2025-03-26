@@ -40,7 +40,7 @@ void ServoArms::init() {
     servo_y_left_axis.setReverseOperation(true);
     servo_x_axis.attach(52, x_axis_degree);
     servo_y_left_axis.attach(51, y_axis_degree);
-    servo_y_right_axis.attach(6, y_axis_degree);
+    servo_y_right_axis.attach(40, y_axis_degree);
     servo_z_axis.attach(9, z_axis_degree);
     servo_r_axis.attach(10, r_axis_degree);
     clamp.attach(50);
