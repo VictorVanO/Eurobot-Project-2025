@@ -27,14 +27,29 @@ Every file we used for our robots are listed in this repository.
 
 ## :rocket: Getting started
 
+### :exclamation: Prerequesites
+
 ### PAMI
+
+#### Groupie
+
+This is the FSM we used for our groupie:
+
+![Finite-State Machine of the PAMI groupie.](/images/FSM-PAMI-Groupie.png)
+
+#### Superstar
+
+This is the FSM we used for our superstar:
+
+![Finite-State Machine of the PAMI superstar.](/images/FSM-PAMI-Superstar.png)
 
 ### Big Robot
 
 This is the FSM we used for our big robot:
+
 ![Finite-State Machine of the big robot.](/images/FSM-Big-Robot.png)
 
-### :exclamation: Prerequesites
+
 
 ## :deciduous_tree: Tree Structure
 
