@@ -27,6 +27,13 @@ Every file we used for our robots are listed in this repository.
 
 ## :rocket: Getting started
 
+### PAMI
+
+### Big Robot
+
+This is the FSM we used for our big robot:
+![Finite-State Machine of the big robot.](/images/FSM-Big-Robot.png)
+
 ### :exclamation: Prerequesites
 
 ## :deciduous_tree: Tree Structure
