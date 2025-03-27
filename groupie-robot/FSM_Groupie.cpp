@@ -35,10 +35,6 @@ void FSM::handleState() {
 
     long distance1 = getDistance(1); // Distance du capteur 1
     long distance2 = getDistance(2); // Distance du capteur 2
-    Serial.println(distance1);
-    Serial.println(distance2);
-    
-
 
     if (millis() - globalTimer >= 20000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
@@ -56,7 +52,17 @@ void FSM::handleState() {
             break;
 
         case FOLLOW_LINE_STATE:
-            goForward();
+            switch (returnDirection()) {
+                case 0:
+                  goForward();
+                  break;
+                case 1:
+                  turnRight();
+                  break;
+                case 2:
+                  turnLeft();
+                  break;
+            }
             if (distance1 <= 10 && distance2 <= 10) {  
             state = AWAIT_OBSTACLE_STATE;
             }

@@ -3,11 +3,10 @@
 
 #include <SoftwareSerial.h>
 
-const int LEFT_IR_SENSOR = 7;
-const int RIGHT_IR_SENSOR = 8;
+const int LEFT_IR_SENSOR = 6;
+const int RIGHT_IR_SENSOR = 5;
 
 void initInfrared();
 int returnDirection();
-int returnDirection2();
 
 #endif
