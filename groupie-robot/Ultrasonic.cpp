@@ -1,21 +1,30 @@
 #include "Ultrasonic.h"
-#include <Arduino.h>
 
 void initUltrasonic() {
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
+    pinMode(TRIG_PIN_1, OUTPUT);
+    pinMode(ECHO_PIN_1, INPUT);
+    pinMode(TRIG_PIN_2, OUTPUT);
+    pinMode(ECHO_PIN_2, INPUT);
 }
 
-float readDistance() {
-  float duration, distance;
+long getDistance(int sensor) {
+    int trigPin, echoPin;
+    
+    if (sensor == 1) {
+        trigPin = TRIG_PIN_1;
+        echoPin = ECHO_PIN_1;
+    } else {
+        trigPin = TRIG_PIN_2;
+        echoPin = ECHO_PIN_2;
+    }
+    
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
 
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration * 0.0343) / 2;
-  return distance;
+    long duration = pulseIn(echoPin, HIGH);
+    long distance = duration * 0.034 / 2; // Conversion en cm
+    return distance;
 }
