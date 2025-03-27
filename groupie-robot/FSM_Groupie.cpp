@@ -66,6 +66,9 @@ void FSM::handleState() {
             stopMotors();
             delay(500);
 
+            distance1 = getDistance(1);
+            distance2 = getDistance(2);
+
             if (distance1 >= 10 && distance2 >= 10) {  
                 state = FOLLOW_LINE_STATE;
             }
