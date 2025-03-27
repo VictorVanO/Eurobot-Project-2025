@@ -12,7 +12,7 @@ void FSM::init() {
     initUltrasonic();
     //initServoLed();
     initEmergencyButton();
-    motorSpeed = 100;
+    motorSpeed =65;
     setMotorsSpeed(motorSpeed);
     state = IDLE; 
     startTime = millis();
@@ -33,6 +33,9 @@ void FSM::handleState() {
         //while (1);  // Boucle infinie pour stopper définitivement le robot
     //}
 
+
+    
+
     long distance1 = getDistance(1); // Distance du capteur 1
     long distance2 = getDistance(2); // Distance du capteur 2
 
@@ -51,22 +54,27 @@ void FSM::handleState() {
             }
             break;
 
-        case FOLLOW_LINE_STATE:
-            switch (returnDirection()) {
-                case 0:
-                  goForward();
-                  break;
-                case 1:
-                  turnRight();
-                  break;
-                case 2:
-                  turnLeft();
-                  break;
-            }
-            if (distance1 <= 10 && distance2 <= 10) {  
-            state = AWAIT_OBSTACLE_STATE;
-            }
-            break;
+            case FOLLOW_LINE_STATE:
+                switch (returnDirection()) {
+                    case 0:
+                      goForward();
+                      break;
+                    case 1:
+                      turnLeft();
+                      break;
+                    case 2:
+                      turnRight();
+                      break;
+                    case 3:
+                      goForward();
+                      break;
+                }
+            
+          
+                if (distance1 <= 10 && distance2 <= 10) {
+                    state = AWAIT_OBSTACLE_STATE;
+                }
+                break;
 
         case AWAIT_OBSTACLE_STATE:
             stopMotors();
@@ -85,6 +93,5 @@ void FSM::handleState() {
             stopMotors();
             //party();
             break;
-
     }
 }
