@@ -71,7 +71,7 @@ void FSM::handleState() {
                 }
             
           
-                if (distance1 <= 10 && distance2 <= 10) {
+                if (distance1 <= 26 && distance2 <= 26) {
                     state = AWAIT_OBSTACLE_STATE;
                 }
                 break;
@@ -83,7 +83,7 @@ void FSM::handleState() {
             distance1 = getDistance(1);
             distance2 = getDistance(2);
 
-            if (distance1 >= 10 && distance2 >= 10) {  
+            if (distance1 >= 26 && distance2 >= 26) {  
                 state = FOLLOW_LINE_STATE;
             }
             break;
