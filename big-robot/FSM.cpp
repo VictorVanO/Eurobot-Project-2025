@@ -49,6 +49,7 @@ bool FSM::isObstacleDetected() {
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
+    static unsigned long pauseStartTime = 0;
 
     // Always check for obstacles, even during movements
     if (isMoving) {
@@ -59,6 +60,7 @@ void FSM::handleState() {
             isMoving = false;
             previousState = state;
             state = PAUSE;
+            pauseStartTime = currentTime;
             Serial.println("Obstacle detected during movement! Switching to PAUSE state.");
             return;
         }
@@ -80,6 +82,7 @@ void FSM::handleState() {
         if (isObstacleDetected() && state != PAUSE && state != AVOID_OBSTACLE) {
             previousState = state;
             state = PAUSE;
+            pauseStartTime = currentTime;
             Serial.println("Obstacle detected! Switching to PAUSE state.");
             return;
         }
@@ -107,7 +110,7 @@ void FSM::handleState() {
             // lcd->printLine(1, "arms...");
             if (armsFullyExtended != true) {
                 // Fully extend arms, then change state to open hands to release the banner
-                arms->extendArms();
+                arms->extendArms(); 
                 // delay(2000);
                 armsFullyExtended = true;
                 state = OPEN_HANDS;
@@ -134,14 +137,14 @@ void FSM::handleState() {
             if (!isMoving) {
                 // lcd->printLine(0, "Moving to");
                 // lcd->printLine(1, "first bleacher");
-                startTimedMovement(moveForward, 220, 3000);
+                startTimedMovement(moveForward, 220, 2000);
             }
             break;
 
         case TESTS_STATE:
-            // Only start moving if we're not already in a movement
+            // Move Backward for 2 seconds
             if (!isMoving) {
-                startTimedMovement(moveBackward, 220, 3000);
+                startTimedMovement(moveBackward, 220, 2000);
             }
             break;
         
@@ -229,20 +232,15 @@ void FSM::handleState() {
             // Serial.println("Entering PAUSE state.");
             // lcd->printLine(0, "In PAUSE state");
             // lcd->printLine(1, "Motors stopped");
-            
-            // Non-blocking pause check
-            if (!isMoving) {
-                // startTimedMovement(stopMotors, 0, 2000); // Wait for 2 seconds
-                delay(1000);
-            // } else if (!isMoving) {
-                // Pause time complete, check for obstacles again
+
+            if (currentTime - pauseStartTime >= 2000) {
                 if (!isObstacleDetected()) {
-                    Serial.println("No obstacle detected. Resuming previous state.");
-                    // state = previousState;
-                    state = AVOID_OBSTACLE;
+                    Serial.println("No obstacle detected. Returning to previous state.");
+                    state = previousState;
                 } else {
-                    // state = AVOID_OBSTACLE;
-                    // movementStep = 0;
+                    Serial.println("Obstacle still present. Moving to AVOID_OBSTACLE.");
+                    state = AVOID_OBSTACLE;
+                    movementStep = 0;
                 }
             }
             break;
@@ -252,34 +250,38 @@ void FSM::handleState() {
             Serial.println("Entering AVOID OBSTACLE state.");
             if (!isMoving) {
                 lcd->clear();
-                // lcd->printLine(0, "Avoiding");
-                // lcd->printLine(1, "Obstacle");
                 
-                if (movementStep == 0) {
-                    // First back up a bit
-                    startTimedMovement(moveBackward, 200, 300);
-                } else if (movementStep == 1) {
-                    // Turn right to try to go around
-                    startTimedMovement(turnRight, 200, 100);
-                } else if (movementStep == 2) {
-                    // Check if path is clear
-                    if (!isObstacleDetected()) {
-                        // Move forward
-                        startTimedMovement(moveForward, 200, 500);
-                    } else {
-                        // Path not clear, try turning more
-                        startTimedMovement(turnRight, 200, 500);
-                        // Stay in same step to try again
-                        movementStep = 1;
-                        return;
-                    }
-                } else if (movementStep == 3) {
-                    // Turn left to get back on path
-                    startTimedMovement(turnLeft, 200, 500);
-                } else if (movementStep == 4) {
-                    // Return to previous state
-                    state = previousState;
-                    movementStep = 0;
+                switch(movementStep) {
+                    case 0:
+                        // First back up a bit
+                        startTimedMovement(moveBackward, 200, 300);
+                        break;
+                    case 1:
+                        // Turn right to try to go around
+                        startTimedMovement(turnRight, 200, 100);
+                        break;
+                    case 2:
+                        // Check if path is clear
+                        if (!isObstacleDetected()) {
+                            // Move forward
+                            startTimedMovement(moveForward, 200, 500);
+                        } else {
+                            // Path not clear, try turning more
+                            startTimedMovement(turnRight, 200, 500);
+                            // Stay in same step to try again
+                            movementStep = 1;
+                            return;
+                        }
+                        break;
+                    case 3:
+                        // Turn left to get back on path
+                        startTimedMovement(turnLeft, 200, 500);
+                        break;
+                    case 4:
+                        // Return to previous state
+                        state = previousState;
+                        movementStep = 0;
+                        break;
                 }
             }
             break;
