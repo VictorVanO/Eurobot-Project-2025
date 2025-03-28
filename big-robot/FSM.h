@@ -36,6 +36,7 @@ private:
     RobotState previousState;
     unsigned long startTime;
     unsigned long obstacle_treshold;
+    unsigned long startAvoidance;
     bool secondIsBuilt;
 
     bool isMoving;

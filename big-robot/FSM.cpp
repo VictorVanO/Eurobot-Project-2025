@@ -1,7 +1,7 @@
 #include "FSM.h"
 
 FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(15), secondIsBuilt(false), armsFullyExtended(false),
-                moveStartTime(0), moveDuration(0), movementStep(0) {
+                moveStartTime(0), moveDuration(0), movementStep(0), startAvoidance(0) {
     lcd = new LCD();
     arms = new ServoArms();
 }
@@ -41,6 +41,9 @@ bool FSM::isObstacleDetected() {
 void FSM::handleState() {
     unsigned long currentTime = millis();
     static unsigned long pauseStartTime = 0;
+    unsigned long turnDuration = 50; 
+    const unsigned long backwardAvoidanceDuration = 400;
+    const unsigned long turnRightDuration = 300;
 
     // Check for ongoing timed movement
     if (moveStartTime > 0) {
@@ -102,10 +105,12 @@ void FSM::handleState() {
             break;
          
         case MOVE_TO_FIRST:
+            Serial.println("State: MOVE TO FIRST");
             startTimedMovement(moveForward, 220, 5000);
             break;
 
         case TESTS_STATE:
+            Serial.println("State: TESTS");
             startTimedMovement(moveForward, 160, 2500);
             break;
         
@@ -154,6 +159,7 @@ void FSM::handleState() {
             break;
 
         case PAUSE:
+            Serial.println("State: PAUSE");
             stopMotors();
             if (currentTime - pauseStartTime >= 2000) {
                 if (isObstacleDetected()) {
@@ -166,30 +172,30 @@ void FSM::handleState() {
             break;
             
         case AVOID_OBSTACLE:
-            Serial.println("Entering AVOID OBSTACLE state.");
+            Serial.println("Robot state: AVOID_OBSTACLE");
             
-            switch(movementStep) {
-                case 0:
-                    startTimedMovement(moveBackward, 200, 300);
-                    break;
-                case 1:
-                    startTimedMovement(turnRight, 200, 500);
-                    break;
-                case 2:
-                    startTimedMovement(moveForward, 200, 500);
-                    break;
-                default:
-                    if (isObstacleDetected()) {
-                        // If obstacle detected during movement, stay in AVOID_OBSTACLE state
-                        stopMotors();
-                        movementStep = 0;
-                    } else {
-                        // Reset movement steps and return to previous state if no obstacle
-                        state = previousState;
-                        movementStep = 0;
-                        Serial.println("Completed obstacle avoidance sequence.");
-                    }
-                    break;
+            if (startAvoidance == 0) {
+                startAvoidance = millis();
+            }
+
+            unsigned long elapsedTime = millis() - startAvoidance;
+
+            if (elapsedTime < backwardAvoidanceDuration) {
+                moveBackward(220);
+            }
+            else if (elapsedTime < backwardAvoidanceDuration + turnDuration) {
+                turnRight(220);  // Tourner à droite pour éviter l'obstacle
+            }
+            else {
+                if (isObstacleDetected()) {
+                    // Serial.println("Obstacle toujours présent, recommence l'évitement...");
+                    startAvoidance = millis(); // Réinitialiser le timer et recommencer l'évitement
+                } else {
+                    // Serial.println("Obstacle évité !");
+                    stopMotors();
+                    startAvoidance = 0;
+                    state = MOVE_TO_FIRST;
+                }
             }
             break;
     }
@@ -219,14 +225,6 @@ void FSM::handleMovementCompletion() {
             movementStep++;
             if (movementStep > 1) {
                 state = GRAB_MATERIALS;
-                movementStep = 0;
-            }
-            break;
-            
-        case AVOID_OBSTACLE:
-            movementStep++;
-            
-            if (movementStep > 2) {
                 movementStep = 0;
             }
             break;
