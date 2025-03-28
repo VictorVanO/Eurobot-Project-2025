@@ -27,17 +27,20 @@ void FSM::run() {
 
 // Gestion de l'état
 void FSM::handleState() {
-    //if (isEmergencyActive()) {
-        //Serial.println("Arrêt d'urgence activé !");
-        //stopMotors();
-        //while (1);  // Boucle infinie pour stopper définitivement le robot
-    //}
+    if (isEmergencyActive()) {
+        Serial.println("Arrêt d'urgence activé !");
+        stopMotors();
+        while (1);  // Boucle infinie pour stopper définitivement le robot
+    }
 
 
     
 
     long distance1 = getDistance(1); // Distance du capteur 1
     long distance2 = getDistance(2); // Distance du capteur 2
+    Serial.println(distance1);
+    Serial.println(distance2);
+
 
     if (millis() - globalTimer >= 20000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
@@ -71,7 +74,7 @@ void FSM::handleState() {
                 }
             
           
-                if (distance1 <= 26 && distance2 <= 26) {
+                if (distance1 <= 25 || distance2 <= 25) {
                     state = AWAIT_OBSTACLE_STATE;
                 }
                 break;
@@ -79,11 +82,12 @@ void FSM::handleState() {
         case AWAIT_OBSTACLE_STATE:
             stopMotors();
             delay(500);
+            evitementObstacle();
 
             distance1 = getDistance(1);
             distance2 = getDistance(2);
 
-            if (distance1 >= 26 && distance2 >= 26) {  
+            if (distance1 >= 25 || distance2 >= 25) {  
                 state = FOLLOW_LINE_STATE;
             }
             break;
@@ -95,3 +99,15 @@ void FSM::handleState() {
             break;
     }
 }
+
+void FSM::evitementObstacle() {
+    
+    turnLeft();
+    delay(650);
+    goForward();
+    delay(400);
+    turnRight();
+    delay(650);
+    stopMotors();
+    delay(1000);
+  }

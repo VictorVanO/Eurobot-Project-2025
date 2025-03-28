@@ -27,6 +27,7 @@ private:
     unsigned long globalTimer;
     int motorSpeed;
     void handleState();
+    void evitementObstacle();
 };
 
 #endif
