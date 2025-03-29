@@ -109,7 +109,7 @@ void FSM::evitementObstacle() {
     }
     stopMotors();
 
-    long ticksRotation = getLeftCount() + 3;
+    long ticksRotation = getLeftCount();
     delay(300);
 
     long d1 = getDistance(1);
@@ -120,7 +120,7 @@ void FSM::evitementObstacle() {
     }
 
     goForward();
-    delay(400);
+    delay(600);
     stopMotors();
     delay(400);
     

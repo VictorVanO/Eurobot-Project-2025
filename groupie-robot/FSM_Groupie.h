@@ -5,6 +5,7 @@
 #include "Arduino.h"
 #include "Ultrasonic.h"
 #include "Infrared.h"
+#include "Encoders.h"
 //#include "Servomotor.h"
 #include "ButtonUrgence.h"
 
