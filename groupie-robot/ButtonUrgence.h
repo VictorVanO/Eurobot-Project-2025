@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-const int emergencyButton = 2; 
+const int emergencyButton = 4; 
 
 void initEmergencyButton(); 
 bool isEmergencyActive();   
