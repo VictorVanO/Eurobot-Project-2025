@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(15), secondIsBuilt(false), armsFullyExtended(false),
+FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(18), secondIsBuilt(false), armsFullyExtended(false),
                 moveStartTime(0), moveDuration(0), movementStep(0), startAvoidance(0) {
     lcd = new LCD();
     arms = new ServoArms();
@@ -41,9 +41,9 @@ bool FSM::isObstacleDetected() {
 void FSM::handleState() {
     unsigned long currentTime = millis();
     static unsigned long pauseStartTime = 0;
-    unsigned long turnDuration = 50; 
-    const unsigned long backwardAvoidanceDuration = 400;
-    const unsigned long turnRightDuration = 300;
+    unsigned long turnDuration = 600; 
+    const unsigned long backwardAvoidanceDuration = 600;
+    const unsigned long turnRightDuration = 600;
 
     // Check for ongoing timed movement
     if (moveStartTime > 0) {
@@ -106,11 +106,13 @@ void FSM::handleState() {
          
         case MOVE_TO_FIRST:
             Serial.println("State: MOVE TO FIRST");
+            arms->extendArms(); 
             startTimedMovement(moveForward, 220, 5000);
             break;
 
         case TESTS_STATE:
             Serial.println("State: TESTS");
+            arms->retractArms();
             startTimedMovement(moveForward, 160, 2500);
             break;
         
