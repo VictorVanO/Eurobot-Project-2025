@@ -10,9 +10,10 @@ void FSM::init() {
     Serial.begin(9600);
     initMotors();  // Initialiser les moteurs
     initUltrasonic();
+    initEncoders();
     //initServoLed();
     initEmergencyButton();
-    motorSpeed =65;
+    motorSpeed =50;
     setMotorsSpeed(motorSpeed);
     state = IDLE; 
     startTime = millis();
@@ -22,7 +23,8 @@ void FSM::init() {
 // Exécution de la FSM
 void FSM::run() {
     updateEmergencyState();
-    handleState(); 
+    handleState();
+    updateEncoders();
 }
 
 // Gestion de l'état
@@ -32,21 +34,20 @@ void FSM::handleState() {
         stopMotors();
         while (1);  // Boucle infinie pour stopper définitivement le robot
     }
-
-
     
-
     long distance1 = getDistance(1); // Distance du capteur 1
     long distance2 = getDistance(2); // Distance du capteur 2
-    Serial.println(distance1);
-    Serial.println(distance2);
-
+    
+    Serial.print("Ticks G : ");
+    Serial.print(getLeftCount());
+    Serial.print(" | D : ");
+    Serial.println(getRightCount());
 
     if (millis() - globalTimer >= 20000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
         state = PARTY_STATE;
     }
-
+                
     switch (state) {
         case IDLE:
             Serial.println("État : IDLE");
@@ -58,6 +59,10 @@ void FSM::handleState() {
             break;
 
             case FOLLOW_LINE_STATE:
+                if (distance1 <= 18 || distance2 <= 18) {
+                    state = AWAIT_OBSTACLE_STATE;
+                }
+        
                 switch (returnDirection()) {
                     case 0:
                       goForward();
@@ -72,22 +77,16 @@ void FSM::handleState() {
                       goForward();
                       break;
                 }
-            
-          
-                if (distance1 <= 25 || distance2 <= 25) {
-                    state = AWAIT_OBSTACLE_STATE;
-                }
                 break;
 
         case AWAIT_OBSTACLE_STATE:
             stopMotors();
-            delay(500);
             evitementObstacle();
 
             distance1 = getDistance(1);
             distance2 = getDistance(2);
 
-            if (distance1 >= 25 || distance2 >= 25) {  
+            if (distance1 >= 18 && distance2 >= 18) {  
                 state = FOLLOW_LINE_STATE;
             }
             break;
@@ -101,13 +100,37 @@ void FSM::handleState() {
 }
 
 void FSM::evitementObstacle() {
-    
+    resetCounts();
     turnLeft();
-    delay(650);
+
+    const long ticksCible = 16; 
+    while (getLeftCount() < ticksCible) {
+        updateEncoders();
+    }
+    stopMotors();
+
+    long ticksRotation = getLeftCount() + 3;
+    delay(300);
+
+    long d1 = getDistance(1);
+    long d2 = getDistance(2);
+    if (d1 < 9 || d2 < 9) {
+        state = PARTY_STATE;  
+        return;
+    }
+
     goForward();
     delay(400);
-    turnRight();
-    delay(650);
     stopMotors();
-    delay(1000);
-  }
+    delay(400);
+    
+    resetCounts();
+    turnRight();
+
+    while (getRightCount() < ticksRotation) {
+        updateEncoders();
+    }
+    stopMotors();
+    delay(300);
+}
+
