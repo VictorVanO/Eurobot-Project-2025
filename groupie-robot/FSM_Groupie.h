@@ -13,7 +13,8 @@ enum RobotState {
     IDLE,             
     FOLLOW_LINE_STATE,  
     AWAIT_OBSTACLE_STATE,
-    PARTY_STATE
+    PARTY_STATE,
+    WAIT_CLEAR_STATE
 };
 
 class FSM {
@@ -27,6 +28,8 @@ private:
     unsigned long startTime;
     unsigned long globalTimer;
     int motorSpeed;
+    int avoidStep; 
+    long ticksRotation; 
     void handleState();
     void evitementObstacle();
 };

@@ -1,5 +1,9 @@
 #include "FSM_Groupie.h"
 
+const int AVOID_NONE = 0;
+const int AVOID_TURN_LEFT_DONE = 1;
+const int AVOID_COMPLETED = 2;
+
 // Constructeur
 FSM::FSM() {
     state = IDLE;  // État initial
@@ -43,8 +47,9 @@ void FSM::handleState() {
     Serial.print(" | D : ");
     Serial.println(getRightCount());
 
-    if (millis() - globalTimer >= 20000 && state != PARTY_STATE) {
+    if (millis() - globalTimer >= 18000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
+        stopMotors();
         state = PARTY_STATE;
     }
                 
@@ -81,12 +86,40 @@ void FSM::handleState() {
 
         case AWAIT_OBSTACLE_STATE:
             stopMotors();
-            evitementObstacle();
 
             distance1 = getDistance(1);
             distance2 = getDistance(2);
 
             if (distance1 >= 18 && distance2 >= 18) {  
+                state = FOLLOW_LINE_STATE;
+            }
+
+            evitementObstacle();
+            break;
+
+        case WAIT_CLEAR_STATE:
+            stopMotors();
+            long d1 = getDistance(1);
+            long d2 = getDistance(2);
+        
+            if (d1 > 18 && d2 > 18) {
+        
+                if (avoidStep == AVOID_TURN_LEFT_DONE) {
+                    goForward();
+                    delay(600);
+                    stopMotors();
+                    delay(400);
+        
+                    resetCounts();
+                    turnRight();
+                    while (getRightCount() < ticksRotation) {
+                        updateEncoders();
+                    }
+                    stopMotors();
+                    delay(300);
+                }
+        
+                avoidStep = AVOID_COMPLETED;
                 state = FOLLOW_LINE_STATE;
             }
             break;
@@ -109,13 +142,14 @@ void FSM::evitementObstacle() {
     }
     stopMotors();
 
-    long ticksRotation = getLeftCount();
+    ticksRotation = getLeftCount();
     delay(300);
+    avoidStep = AVOID_TURN_LEFT_DONE;
 
-    long d1 = getDistance(1);
-    long d2 = getDistance(2);
-    if (d1 < 9 || d2 < 9) {
-        state = PARTY_STATE;  
+    long d3 = getDistance(1);
+    long d4 = getDistance(2);
+    if (d3 < 9 || d4 < 9) {
+        state = WAIT_CLEAR_STATE;  
         return;
     }
 
@@ -132,5 +166,7 @@ void FSM::evitementObstacle() {
     }
     stopMotors();
     delay(300);
+    avoidStep = AVOID_COMPLETED;
+    state = FOLLOW_LINE_STATE;
 }
 
