@@ -74,6 +74,27 @@ The Big Robot should be able to do 2 actions in order to score points :
 7. The robot places the second construction on the starting zone
 8. The robot makes a 180° turn and goes to the final construction zone
 
+### Big Robot : Arms
+The Big Robot features a deployable structure equipped with two arms on top of the robot, each fitted with a gripper. These arms are used to place the banner and move the stands to the designated area.
+In the ```3D-Models/big-robot``` folder, you’ll find the STL files for the arm. The table below lists the different files with the total number of times each one needs to be printed to assemble both arms:
+
+| STL File          | Description                                  | Required Quantity |
+|-------------------|----------------------------------------------|-------------------|
+| base-part-1.stl   | Part n°1 of the arm base                     | 2                 |
+| base-part-2.stl   | Part n°2 of the arm base                     | 2                 |
+| base-part-3.stl   | Part n°3 of the arm base                     | 2                 |
+| base-bolt         | Bolt used to attach the arm to the base      | 2                 |
+| arm-1.stl         | 1st segment of the robotic arm               | 2                 |
+| arm-2.stl         | 2nd segment of the robotic arm               | 2                 |
+| gear-x3.stl       | Gear for the whole arm                       | 6                 |
+| arm-hub.stl       | 1st connector between base and 2nd arm joint | 2                 |
+| main-axle.stl     | 2nd connector between base and 2nd arm joint | 2                 |
+| middle-gear.stl   | Gear responsible for the arm movement        | 2                 |
+| middle-axle.stl   | Axis allowing the arm rotation               | 2                 |
+| clamp.stl         | Clamp to hold objects                        | 2                 |
+
+For this arm, we based our design on an existing project, which you can find via this [video](https://www.youtube.com/watch?v=YqrbWCVa3xA), including assembly instructions for the arm.
+
 ### PAMI : Compenents
 Here are the main components for ours PAMI's : 
 - 1 x Arduino Adafruits
