@@ -86,9 +86,9 @@ Here are the main components for ours PAMI's :
 - 1 x Servomotor
 - 1 x LED
 
-### Strategy  
-### Groupie
-## Sensors Used
+# Strategy  
+
+## Groupie : Sensors Used
 
 - **Infrared (IR) Sensors**  
   Used for line-following and distinguishing between black and white surfaces. Placed at the front of the robot, they allow it to follow a line on the ground or detect nearby obstacles.
@@ -109,15 +109,18 @@ The robot follows a black line on a light surface using the IR sensors. By analy
 ### Obstacle Avoidance  
 When an obstacle is detected by the distance sensor, the robot interrupts line following and performs an avoidance maneuver based on a simple algorithm (stop, turn, go forwoard, turn).
 
-### Superstar 
+## Superstar : Sensors Used
 ## Sensors Used
 
 - **Distance Sensor (Ultrasonic)**  
   Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
 
+---
 
+## Overall Strategy
 
-
+### Obstacle Avoidance  
+When an obstacle is detected by the distance sensor, the robot interrupts line following and stop until there is no more obstacle. 
 
 
 
