@@ -110,7 +110,6 @@ The robot follows a black line on a light surface using the IR sensors. By analy
 When an obstacle is detected by the distance sensor, the robot interrupts line following and performs an avoidance maneuver based on a simple algorithm (stop, turn, go forwoard, turn).
 
 ## Superstar : Sensors Used
-## Sensors Used
 
 - **Distance Sensor (Ultrasonic)**  
   Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
@@ -120,7 +119,7 @@ When an obstacle is detected by the distance sensor, the robot interrupts line f
 ## Overall Strategy
 
 ### Obstacle Avoidance  
-When an obstacle is detected by the distance sensor, the robot interrupts line following and stop until there is no more obstacle. 
+When an obstacle is detected by the distance sensor, the robot stop until there is no more obstacle. 
 
 
 
