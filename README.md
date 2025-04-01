@@ -74,6 +74,53 @@ The Big Robot should be able to do 2 actions in order to score points :
 7. The robot places the second construction on the starting zone
 8. The robot makes a 180° turn and goes to the final construction zone
 
+### PAMI : Compenents
+Here are the main components for ours PAMI's : 
+- 1 x Arduino Adafruits
+- 2 x HC-SR04 Ultrasonic sensors
+- 2 x Infrared sensors
+- 2 x DC Motors with corresponding wheels
+- 1 x breadboard
+- 1 x Emergency Button
+- 2 x Optical encoders
+- 1 x Servomotor
+- 1 x LED
+
+### Strategy  
+### Groupie
+## Sensors Used
+
+- **Infrared (IR) Sensors**  
+  Used for line-following and distinguishing between black and white surfaces. Placed at the front of the robot, they allow it to follow a line on the ground or detect nearby obstacles.
+
+- **Optical Fork Sensors (Encoders)**  
+  Each wheel is equipped with a slotted disk attached to the motor shaft and an optical fork sensor that detects interruptions of the infrared beam caused by the slots. For every detected interruption, a pulse is generated on a microcontroller's digital input. This allows the robot to repeat the same movements on both wheels, improving synchronization and control.
+
+- **Distance Sensor (Ultrasonic)**  
+  Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
+
+---
+
+## Overall Strategy
+
+### Line Following  
+The robot follows a black line on a light surface using the IR sensors. By analyzing the left/right sensor signals, it adjusts its trajectory to stay centered on the line.
+
+### Obstacle Avoidance  
+When an obstacle is detected by the distance sensor, the robot interrupts line following and performs an avoidance maneuver based on a simple algorithm (stop, turn, go forwoard, turn).
+
+### Superstar 
+## Sensors Used
+
+- **Distance Sensor (Ultrasonic)**  
+  Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
+
+
+
+
+
+
+
 ## :deciduous_tree: Tree Structure
 
 ```bash
