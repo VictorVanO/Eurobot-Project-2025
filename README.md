@@ -63,6 +63,16 @@ Here are the main components for our robot :
 - 1 x Emergency Button
 - 1 x Starting Magnetic Reed
    
+### Big Robot : Strategy
+The Big Robot should be able to do 2 actions in order to score points : 
+1. The robot should deposit the banner using the 2 arm, one for each π-shaped support.
+2. The arms should rotate around the robot and be placed up front
+3. The robot moves to take the first construction in front
+4. The robot grips the construction, lifts it using the 2 arms and places it on the side
+5. The robot makes a 180° turn
+6. The robot moves to the second construction and lifts it using the arms
+7. The robot places the second construction on the starting zone
+8. The robot makes a 180° turn and goes to the final construction zone
 
 ## :deciduous_tree: Tree Structure
 
