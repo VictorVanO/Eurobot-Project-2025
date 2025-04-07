@@ -1,3 +1,9 @@
+#ifdef UNIT_TEST
+    #include "ArduinoFake.h"
+#else
+    #include "Arduino.h"
+#endif
+
 #include "FSM.h"
 #include "ServoEasing.hpp"
 
