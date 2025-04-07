@@ -7,8 +7,6 @@
 #include "LCD.h"
 #include "ServoArms.h"
 
-// #define NUM_ULTRASONIC 3  // Number of ultrasonic sensors
-
 enum RobotState {
     INIT,
     MOVE_ARMS,
@@ -34,15 +32,17 @@ public:
 private:
     RobotState state;
     RobotState previousState;
+    RobotState nextState;
+
     unsigned long startTime;
     unsigned long obstacle_treshold;
     unsigned long startAvoidance;
     bool secondIsBuilt;
 
     bool isMoving;
+    bool isMovingBackward;
     unsigned long moveStartTime;
     unsigned long moveDuration;
-    int movementStep;
     bool armsFullyExtended;
 
     LCD* lcd;
@@ -51,7 +51,6 @@ private:
     bool isObstacleDetected();
     void handleState();
     void startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration);
-    void handleMovementCompletion();
 };
 
 #endif

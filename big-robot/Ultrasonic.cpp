@@ -25,3 +25,24 @@ float readDistance(int sensorIndex) {
 
     return distance;
 }
+
+
+bool isFrontObstacleDetected(float threshold) {
+    for (int i = FRONT_SENSORS_START; i < FRONT_SENSORS_START + NUM_FRONT_SENSORS; i++) {
+        float distance = readDistance(i);
+        if (distance > 0 && distance <= threshold) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isBackObstacleDetected(float threshold) {
+    for (int i = BACK_SENSORS_START; i < BACK_SENSORS_START + NUM_BACK_SENSORS; i++) {
+        float distance = readDistance(i);
+        if (distance > 0 && distance <= threshold) {
+            return true;
+        }
+    }
+    return false;
+}

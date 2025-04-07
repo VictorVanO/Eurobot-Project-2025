@@ -1,7 +1,7 @@
 #include "FSM.h"
 
 FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(18), secondIsBuilt(false), armsFullyExtended(false),
-                moveStartTime(0), moveDuration(0), movementStep(0), startAvoidance(0) {
+                moveStartTime(0), moveDuration(0), startAvoidance(0), isMovingBackward(false) {
     lcd = new LCD();
     arms = new ServoArms();
 }
@@ -22,17 +22,31 @@ void FSM::run() {
     handleState();
 }
 
-void FSM::startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration) {
+void FSM::startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration, RobotState next) {
+    isMovingBackward = (moveFunction == moveBackward);
+
     moveFunction(speed);
     moveStartTime = millis();
     moveDuration = duration;
+
+    nextState = next;
 }
 
+
 bool FSM::isObstacleDetected() {
-    for (int i = 0; i < NUM_ULTRASONIC; i++) {
+    for (int i = 0; i < 3; i++) {
         float distance = readDistance(i);
         if (distance > 0 && distance <= obstacle_treshold) {
             return true;
+        }
+    }
+    
+    if (isMovingBackward) {
+        for (int i = 3; i < NUM_ULTRASONIC; i++) {
+            float distance = readDistance(i);
+            if (distance > 0 && distance <= obstacle_treshold) {
+                return true;
+            }
         }
     }
     return false;
@@ -41,49 +55,47 @@ bool FSM::isObstacleDetected() {
 void FSM::handleState() {
     unsigned long currentTime = millis();
     static unsigned long pauseStartTime = 0;
-    unsigned long turnDuration = 600; 
     const unsigned long backwardAvoidanceDuration = 600;
-    const unsigned long turnRightDuration = 600;
+    const unsigned long turnDuration = 600;
 
-    // Check for ongoing timed movement
     if (moveStartTime > 0) {
         // Check if movement time is complete
         if (currentTime - moveStartTime >= moveDuration) {
             stopMotors();
             moveStartTime = 0;
-            handleMovementCompletion();
+            isMovingBackward = false;
+            state = nextState;
+            return;
         }
         
         // Obstacle check during movement
         if (isObstacleDetected() && state != PAUSE && state != AVOID_OBSTACLE) {
             stopMotors();
             moveStartTime = 0;
+            isMovingBackward = false;
             previousState = state;
             state = PAUSE;
             pauseStartTime = currentTime;
             Serial.println("Obstacle detected during movement! Switching to PAUSE state.");
             return;
         }
-        
-        // Continue current movement if not stopped
         return;
     }
 
     // Regular obstacle check when not moving
-    if (isObstacleDetected() && state != PAUSE && state != AVOID_OBSTACLE) {
-        previousState = state;
-        state = PAUSE;
-        pauseStartTime = currentTime;
-        Serial.println("Obstacle detected! Switching to PAUSE state.");
-        return;
-    }
+    // if (isObstacleDetected() && state != PAUSE && state != AVOID_OBSTACLE) {
+    //     previousState = state;
+    //     state = PAUSE;
+    //     pauseStartTime = currentTime;
+    //     Serial.println("Obstacle detected! Switching to PAUSE state.");
+    //     return;
+    // }
 
     switch (state) {
         case INIT:
             Serial.println("State: INIT");
             if (startTime == 0) startTime = millis();
             state = MOVE_TO_FIRST;
-            movementStep = 0;
             break;
 
         case MOVE_ARMS:
@@ -107,13 +119,13 @@ void FSM::handleState() {
         case MOVE_TO_FIRST:
             Serial.println("State: MOVE TO FIRST");
             arms->extendArms(); 
-            startTimedMovement(moveForward, 220, 5000);
+            startTimedMovement(moveForward, 220, 5000, TESTS_STATE);
             break;
 
         case TESTS_STATE:
             Serial.println("State: TESTS");
             arms->retractArms();
-            startTimedMovement(moveForward, 160, 2500);
+            startTimedMovement(moveForward, 160, 2500, MOVE_TO_FIRST);
             break;
         
         case GRAB_MATERIALS:
@@ -123,14 +135,11 @@ void FSM::handleState() {
             state = MOVE_TO_CONSTRUCTION;
             movementStep = 0;
             break;
-        
+
         case MOVE_TO_CONSTRUCTION:
             if (!secondIsBuilt) {
-                if (movementStep == 0) {
-                    startTimedMovement(turnRight, 185, 120);
-                } else if (movementStep == 1) {
-                    startTimedMovement(moveForward, 185, 500);
-                }
+                Serial.println("Moving to construction site");
+                startTimedMovement(turnRight, 185, 120, BUILD_BLEACHER);
             } else {
                 stopMotors();
                 state = BUILD_BLEACHER;
@@ -149,15 +158,11 @@ void FSM::handleState() {
             break;
         
         case MOVE_TO_SECOND:
-            if (movementStep == 0) {
-                startTimedMovement(turnLeft, 185, 100);
-            } else if (movementStep == 1) {
-                startTimedMovement(moveForward, 185, 500);
-            }
+            startTimedMovement(turnLeft, 185, 100, GRAB_MATERIALS);
             break;
             
         case GO_HOME:
-            startTimedMovement(moveForward, 185, 1000);
+            startTimedMovement(moveForward, 185, 1000, INIT);
             break;
 
         case PAUSE:
@@ -166,7 +171,7 @@ void FSM::handleState() {
             if (currentTime - pauseStartTime >= 2000) {
                 if (isObstacleDetected()) {
                     state = AVOID_OBSTACLE;
-                    movementStep = 0;
+                    startAvoidance = 0;
                 } else {
                     state = previousState;
                 }
@@ -183,51 +188,31 @@ void FSM::handleState() {
             unsigned long elapsedTime = millis() - startAvoidance;
 
             if (elapsedTime < backwardAvoidanceDuration) {
-                moveBackward(220);
-            }
-            else if (elapsedTime < backwardAvoidanceDuration + turnDuration) {
-                turnRight(220);  // Tourner à droite pour éviter l'obstacle
-            }
-            else {
-                if (isObstacleDetected()) {
-                    // Serial.println("Obstacle toujours présent, recommence l'évitement...");
-                    startAvoidance = millis(); // Réinitialiser le timer et recommencer l'évitement
-                } else {
-                    // Serial.println("Obstacle évité !");
+                
+                bool backObstacle = false;
+                for (int i = 3; i < NUM_ULTRASONIC; i++) {
+                    float distance = readDistance(i);
+                    if (distance > 0 && distance <= obstacle_treshold) {
+                        backObstacle = true;
+                        break;
+                    }
+                }
+                
+                if (backObstacle) {
                     stopMotors();
-                    startAvoidance = 0;
-                    state = MOVE_TO_FIRST;
+                    startAvoidance = millis() - backwardAvoidanceDuration;
+                } else {
+                    isMovingBackward = true;
+                    moveBackward(220);
                 }
-            }
-            break;
-    }
-}
-
-void FSM::handleMovementCompletion() {
-    switch (state) {
-        case MOVE_TO_FIRST:
-            state = TESTS_STATE;
-            break;
-
-        case TESTS_STATE:
-            state = MOVE_TO_FIRST;
-            break;
-            
-        case MOVE_TO_CONSTRUCTION:
-            if (!secondIsBuilt) {
-                movementStep++;
-                if (movementStep > 1) {
-                    state = BUILD_BLEACHER;
-                    movementStep = 0;
-                }
-            }
-            break;
-            
-        case MOVE_TO_SECOND:
-            movementStep++;
-            if (movementStep > 1) {
-                state = GRAB_MATERIALS;
-                movementStep = 0;
+            } else if (elapsedTime < backwardAvoidanceDuration + turnDuration) {
+                isMovingBackward = false;
+                turnRight(220);
+            } else {
+                stopMotors();
+                isMovingBackward = false;
+                startAvoidance = 0;
+                state = previousState;
             }
             break;
     }
