@@ -32,10 +32,10 @@ bool FSM::isObstacleDetected() {
     for (int i = 0; i < NUM_ULTRASONIC; i++) {
         float distance = readDistance(i);
         if (distance > 0 && distance <= obstacle_treshold) {
-            return true; // Obstacle detected
+            return true;
         }
     }
-    return false; // No obstacle detected
+    return false;
 }
 
 void FSM::handleState() {
