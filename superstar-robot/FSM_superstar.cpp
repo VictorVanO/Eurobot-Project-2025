@@ -13,8 +13,8 @@ void FSM::init() {
     initUltrasonic();
     initServoLed();
     initEmergencyButton();
-    motorSpeed = 70;
-    motorSpeed1 = 40;
+    motorSpeed = 90;
+    motorSpeed1 = 55;
     motorSpeed2 = 50;
     
 
@@ -67,18 +67,18 @@ void FSM::handleState() {
             break;
 
         case MOVE_FORWARD_STATE:
-            if (millis() - startTime - obstacleTotalTime < 6500) {
+            if (millis() - startTime - obstacleTotalTime < 6000) {
                 Serial.println("État : AVANCER");
                 goForward();
             } 
             
-            else if (millis() - startTime - obstacleTotalTime < 8000) {
+            else if (millis() - startTime - obstacleTotalTime < 7500) {
                 Serial.println("État : TOURNER À DROITE");
                 setMotorsSpeed(motorSpeed1);
                 turnRight();
             } 
             
-            else if (millis() - startTime - obstacleTotalTime <= 9000) {
+            else if (millis() - startTime - obstacleTotalTime <= 8000) {
                 Serial.println("État : REPARTIR TOUT DROIT");
                 goForward();
                 setMotorsSpeed(motorSpeed2);
