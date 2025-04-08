@@ -5,7 +5,6 @@
 #define NUM_FRONT_SENSORS 3
 #define NUM_BACK_SENSORS 3
 
-// Sensor indices
 #define FRONT_SENSORS_START 0
 #define BACK_SENSORS_START 3
 
