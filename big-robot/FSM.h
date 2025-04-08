@@ -41,7 +41,6 @@ private:
 
     bool isMoving;
     bool isMovingBackward;
-    bool goingBackward;
     unsigned long moveStartTime;
     unsigned long moveDuration;
     bool armsFullyExtended;
