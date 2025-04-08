@@ -112,7 +112,7 @@ void FSM_jaune::handleState() {
         case PARTY_STATE:
             Serial.println("Party time !");
             stopMotors();
-            //party();
+            party();
             break;
     }
 }

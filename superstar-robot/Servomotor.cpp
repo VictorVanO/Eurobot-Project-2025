@@ -8,7 +8,6 @@ const int durationParty = 10000;
 unsigned long partyStartTime;     
 
 void initServoLed() {
-    //pinMode(ledPin, OUTPUT);
     myServo.attach(11);
     myServo.write(startAngle);
 
@@ -28,18 +27,14 @@ void angle() {
 }
 
 void party() {
-    Serial.println("TIME TO PARTYYY 🎉");
-    partyStartTime = millis();  // Stocker le temps de début
-
-    while (millis() - partyStartTime < durationParty) {  // Boucle pendant 10 sec
-        angle();  // Déplacement du servo
+    partyStartTime = millis(); 
+    while (millis() - partyStartTime < durationParty) { 
+        angle();  
         //digitalWrite(ledPin, HIGH);
-        //delay(1000);
+        delay(1000);
         //digitalWrite(ledPin, LOW);
-        //delay(1000);
+        delay(1000);
     }
-
-    Serial.println("END OF THE PARTY 🎭");
     myServo.detach();  
 }
 

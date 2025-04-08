@@ -116,7 +116,7 @@ void FSM_bleu::handleState() {
         case PARTY_STATE:
             Serial.println("Party time !");
             stopMotors();
-            //party();
+            party();
             break;
     }
 }
