@@ -50,7 +50,7 @@ private:
 
     bool isObstacleDetected();
     void handleState();
-    void startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration);
+    void startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration, RobotState next);
 };
 
 #endif

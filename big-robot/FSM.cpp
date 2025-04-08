@@ -133,7 +133,6 @@ void FSM::handleState() {
             stopMotors();
             arms->grabMaterials();
             state = MOVE_TO_CONSTRUCTION;
-            movementStep = 0;
             break;
 
         case MOVE_TO_CONSTRUCTION:
@@ -150,10 +149,8 @@ void FSM::handleState() {
             if (!secondIsBuilt) {
                 secondIsBuilt = true;
                 state = MOVE_TO_SECOND;
-                movementStep = 0;
             } else {
                 state = GO_HOME;
-                movementStep = 0;
             }
             break;
         
@@ -177,42 +174,23 @@ void FSM::handleState() {
                 }
             }
             break;
-            
+        
         case AVOID_OBSTACLE:
-            Serial.println("Robot state: AVOID_OBSTACLE");
-            
-            if (startAvoidance == 0) {
-                startAvoidance = millis();
-            }
-
-            unsigned long elapsedTime = millis() - startAvoidance;
-
-            if (elapsedTime < backwardAvoidanceDuration) {
-                
-                bool backObstacle = false;
-                for (int i = 3; i < NUM_ULTRASONIC; i++) {
-                    float distance = readDistance(i);
-                    if (distance > 0 && distance <= obstacle_treshold) {
-                        backObstacle = true;
-                        break;
-                    }
-                }
-                
-                if (backObstacle) {
-                    stopMotors();
-                    startAvoidance = millis() - backwardAvoidanceDuration;
-                } else {
-                    isMovingBackward = true;
-                    moveBackward(220);
-                }
-            } else if (elapsedTime < backwardAvoidanceDuration + turnDuration) {
-                isMovingBackward = false;
-                turnRight(220);
-            } else {
-                stopMotors();
-                isMovingBackward = false;
-                startAvoidance = 0;
-                state = previousState;
+            static int avoidStep = 0;
+        
+            switch (avoidStep) {
+                case 0:
+                    startTimedMovement(moveBackward, 160, 1000, AVOID_OBSTACLE);
+                    avoidStep++;
+                    break;
+                case 1:
+                    startTimedMovement(turnRight, 160, 500, AVOID_OBSTACLE);
+                    avoidStep++;
+                    break;
+                case 2:
+                    startTimedMovement(moveForward, 160, 1000, previousState);
+                    avoidStep = 0;
+                    break;
             }
             break;
     }
