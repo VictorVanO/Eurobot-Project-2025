@@ -8,6 +8,7 @@
 #include "ButtonUrgence.h"
 #include "SwitchSelector.h"
 #include "FSM_common.h"
+#include "Tirette.h"
 
 
 class FSM_bleu {
