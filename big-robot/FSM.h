@@ -38,8 +38,10 @@ private:
     unsigned long obstacle_treshold;
     bool secondIsBuilt;
 
+
     bool isMoving;
     bool isMovingBackward;
+    bool goingBackward;
     unsigned long moveStartTime;
     unsigned long moveDuration;
     bool armsFullyExtended;

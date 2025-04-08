@@ -1,7 +1,7 @@
 #include "FSM.h"
 
 FSM::FSM() :    state(INIT), startTime(0), obstacle_treshold(18), secondIsBuilt(false), armsFullyExtended(false),
-                moveStartTime(0), moveDuration(0), isMovingBackward(false) {
+                moveStartTime(0), moveDuration(0), isMovingBackward(false), goingBackward(false) {
     lcd = new LCD();
     arms = new ServoArms();
 }
@@ -23,17 +23,15 @@ void FSM::run() {
 }
 
 void FSM::startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration, RobotState next) {
-    if (moveFunction == moveBackward) {
-        isMovingBackward = true;
-    } else {
-        isMovingBackward = false;
-    }
-    // isMovingBackward = (moveFunction == moveBackward);
-
+    // if (moveFunction == moveBackward) {
+    //     isMovingBackward = true;
+    // } else {
+    //     isMovingBackward = false;
+    // }
+    isMovingBackward = (moveFunction == moveBackward);
     moveFunction(speed);
     moveStartTime = millis();
     moveDuration = duration;
-
     nextState = next;
 }
 
@@ -49,9 +47,10 @@ bool FSM::isObstacleDetected() {
     }
     
     if (isMovingBackward) {
-        for (int i = 3; i < NUM_ULTRASONIC; i++) {
+        for (int i = 4; i < 5; i++) {
             float distance = readDistance(i);
-            Serial.println(distance);
+            Serial.print(distance);
+            Serial.println("cm");
             if (distance > 0 && distance <= obstacle_treshold) {
                 return true;
             }
@@ -66,6 +65,7 @@ void FSM::handleState() {
     static unsigned long pauseStartTime = 0;
 
     if (moveStartTime > 0) {
+        // Stop motors when movement is finished
         if (currentTime - moveStartTime >= moveDuration) {
             stopMotors();
             moveStartTime = 0;
@@ -75,13 +75,25 @@ void FSM::handleState() {
         }
         
         // Change to Pause state if there is an obstacle during movement
-        if (isObstacleDetected() && state != PAUSE && state) {
+        if (isObstacleDetected() && state != PAUSE && state != AVOID_OBSTACLE) {
             stopMotors();
             moveStartTime = 0;
             isMovingBackward = false;
             previousState = state;
             state = PAUSE;
             pauseStartTime = currentTime;
+            return;
+        }
+
+        // Check if obstacle detected while moving backward and stop if needed
+        if (goingBackward == true && isObstacleDetected()) {
+            stopMotors();
+            moveStartTime = 0;
+            isMovingBackward = false;
+            previousState = state;
+            state = PAUSE;
+            pauseStartTime = currentTime;
+            Serial.println("Obstacle detected during backward movement. Stopping.");
             return;
         }
         return;
@@ -163,7 +175,7 @@ void FSM::handleState() {
         case PAUSE:
             Serial.println("State: PAUSE");
             stopMotors();
-            if (currentTime - pauseStartTime >= 2000) {
+            if (currentTime - pauseStartTime >= 3000) {
                 if (isObstacleDetected()) {
                     state = AVOID_OBSTACLE;
                 } else {
@@ -174,53 +186,45 @@ void FSM::handleState() {
         
         case AVOID_OBSTACLE:
             Serial.println("State: AVOID OBSTACLE");
-            obstacle_treshold = 8;
             static int avoidStep = 0;
 
             switch (avoidStep) {
                 case 0:
                     if (moveStartTime == 0) {
-                        Serial.println(avoidStep);
-                        Serial.println(isMovingBackward);
-                        startTimedMovement(moveBackward, 160, 4000, AVOID_OBSTACLE);
+                        goingBackward = true;
+                        startTimedMovement(moveBackward, 160, 1000, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 1:
                     if (moveStartTime == 0) {
-                        Serial.println(avoidStep);
-                        Serial.println(isMovingBackward);
+                        goingBackward = false;
                         startTimedMovement(turnRight, 160, 600, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 2:
                     if (moveStartTime == 0) {
-                        Serial.println(avoidStep);
                         startTimedMovement(moveForward, 220, 2000, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 3:
                     if (moveStartTime == 0) {
-                        Serial.println(avoidStep);
                         startTimedMovement(turnLeft, 160, 1200, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 4:
                     if (moveStartTime == 0) {
-                        Serial.println(avoidStep);
                         startTimedMovement(moveForward, 160, 2000, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 5:
                     if (moveStartTime == 0) {
-                        Serial.println(avoidStep);
                         startTimedMovement(turnRight, 160, 600, previousState);
                         avoidStep = 0;
-                        obstacle_treshold = 18;
                     }
                     break;
             }
