@@ -16,9 +16,11 @@ public:
     FSM_bleu();
     void init();
     void run();
+    void autoriserDemarrage();
 
 private:
     RobotState state;
+    bool demarrageAutorise = false;
     unsigned long startTime;
     unsigned long globalTimer;
     unsigned long directionTimer;

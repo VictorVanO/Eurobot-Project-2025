@@ -1,6 +1,12 @@
 #include "FSM_bleu_superstar.h"
 
-
+void FSM_bleu::autoriserDemarrage() {
+    demarrageAutorise = true;
+    startTime = millis();     // Lancer les timers ici, proprement
+    globalTimer = millis();
+    obstacleStart = millis();
+    obstacleTotalTime = 0;
+}
 
 // Constructeur
 FSM_bleu::FSM_bleu() {
@@ -35,6 +41,12 @@ void FSM_bleu::run() {
 
 // Gestion de l'état
 void FSM_bleu::handleState() {
+    if (!demarrageAutorise) {
+        Serial.println("En attente de la tirette...");
+        stopMotors();
+        return;
+    }
+    
     if (isEmergencyActive()) {
         Serial.println("Arrêt d'urgence activé !");
         stopMotors();

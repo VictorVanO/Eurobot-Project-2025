@@ -9,5 +9,5 @@ void Tirette::begin() {
 }
 
 bool Tirette::estActivee() {
-  return digitalRead(_pin) == HIGH; 
+  return digitalRead(_pin) == LOW; 
 }

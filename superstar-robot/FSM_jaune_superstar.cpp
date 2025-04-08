@@ -1,6 +1,12 @@
 #include "FSM_jaune_superstar.h"
 
-
+void FSM_jaune::autoriserDemarrage() {
+    demarrageAutorise = true;
+    startTime = millis();     // Lancer les timers ici, proprement
+    globalTimer = millis();
+    obstacleStart = millis();
+    obstacleTotalTime = 0;
+}
 
 // Constructeur
 FSM_jaune::FSM_jaune() {
@@ -21,10 +27,6 @@ void FSM_jaune::init() {
     
     setMotorsSpeed(motorSpeed);
     state = IDLE; 
-    startTime = millis();
-    globalTimer = millis();
-    obstacleStart = millis();
-    obstacleTotalTime = 0;
 }
 
 // Exécution de la FSM
@@ -35,6 +37,12 @@ void FSM_jaune::run() {
 
 // Gestion de l'état
 void FSM_jaune::handleState() {
+    if (!demarrageAutorise) {
+        Serial.println("En attente de la tirette...");
+        stopMotors();
+        return;
+    }
+    
     if (isEmergencyActive()) {
         Serial.println("Arrêt d'urgence activé !");
         stopMotors();
