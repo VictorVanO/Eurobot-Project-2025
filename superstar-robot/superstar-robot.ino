@@ -1,12 +1,34 @@
-#include "FSM_superstar.h"
+#include "FSM_jaune_superstar.h"  
+#include "FSM_bleu_superstar.h"       
 
-FSM fsm;  // Création de l'instance de la FSM
+const int modeSwitchPin = 3;
+ModeSelector selector(modeSwitchPin);
+
+
+FSM_jaune fsmJaune;
+FSM_bleu fsmBleu;
+
+bool useBlue = false;
 
 void setup() {
-    fsm.init();   // Initialiser la FSM et les moteurs
+    Serial.begin(9600);
+    selector.begin();
+    if (selector.isPrimaryMode()) {
+        Serial.println("FSM_bleu");
+        useBlue = true;
+        fsmBleu.init(); 
+    } else {
+        Serial.println("FSM_jaune");
+        useBlue = false;
+        fsmJaune.init();  
+    }
 }
 
 void loop() {
-    fsm.run();    // Exécuter la FSM en continu
+    if (useBlue) {
+        fsmBleu.run();
+    } else {
+        fsmJaune.run();
+    }
     delay(100);
 }
