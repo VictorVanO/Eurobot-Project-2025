@@ -38,12 +38,12 @@ ServoArms::~ServoArms() {
 
 void ServoArms::init() {
     servo_y_left_axis.setReverseOperation(true);
-    servo_x_axis.attach(52, x_axis_degree);
-    servo_y_left_axis.attach(51, y_axis_degree);
-    servo_y_right_axis.attach(40, y_axis_degree);
-    servo_z_axis.attach(9, z_axis_degree);
-    servo_r_axis.attach(10, r_axis_degree);
-    clamp.attach(50);
+    servo_x_axis.attach(40, x_axis_degree);
+    servo_y_left_axis.attach(41, y_axis_degree);
+    servo_y_right_axis.attach(42, y_axis_degree);
+    servo_z_axis.attach(43, z_axis_degree);
+    servo_r_axis.attach(44, r_axis_degree);
+    clamp.attach(45);
     clamp.write(clamp_closed_degree);
     
     setEasingTypeForAllServos(EASE_SINE_IN_OUT);
