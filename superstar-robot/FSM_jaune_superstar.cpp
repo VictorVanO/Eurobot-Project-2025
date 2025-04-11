@@ -37,6 +37,7 @@ void FSM_jaune::run() {
 
 // Gestion de l'état
 void FSM_jaune::handleState() {
+    digitalWrite(ledPin, LOW);
     if (!demarrageAutorise) {
         Serial.println("En attente de la tirette...");
         stopMotors();

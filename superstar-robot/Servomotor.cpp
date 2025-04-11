@@ -8,6 +8,8 @@ const int durationParty = 10000;
 unsigned long partyStartTime;     
 
 void initServoLed() {
+    pinMode(ledPin,OUTPUT);
+    digitalWrite(ledPin, LOW);
     myServo.attach(11);
     myServo.write(startAngle);
 
@@ -30,10 +32,10 @@ void party() {
     partyStartTime = millis(); 
     while (millis() - partyStartTime < durationParty) { 
         angle();  
-        //digitalWrite(ledPin, HIGH);
-        delay(1000);
-        //digitalWrite(ledPin, LOW);
-        delay(1000);
+        digitalWrite(ledPin, HIGH);
+        delay(500);
+        digitalWrite(ledPin, LOW);
+        delay(500);
     }
     myServo.detach();  
 }
