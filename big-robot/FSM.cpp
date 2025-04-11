@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(18), secondIsBuilt(false), armsFullyExtended(false),
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(20), secondIsBuilt(false), armsFullyExtended(false),
              moveStartTime(0), moveDuration(0), isMovingBackward(false) {
     lcd = new LCD();
     arms = new ServoArms();
@@ -89,10 +89,10 @@ void FSM::handleState() {
                 stopMotors();
                 moveStartTime = 0;
                 
-                // For backward movement (step 1), skip to step 2
-                if (avoidStep == 1 && isMovingBackward) {
+                // For backward movement (step 0), skip to step 1
+                if (avoidStep == 0 && isMovingBackward) {
                     Serial.println("Skipping backward step due to obstacle");
-                    avoidStep = 2;
+                    avoidStep = 1;
                 } 
                 // For forward movement (step 2 or 4), try a different direction
                 else if ((avoidStep == 2 || avoidStep == 4) && !isMovingBackward) {
