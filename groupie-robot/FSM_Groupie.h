@@ -8,6 +8,7 @@
 #include "Encoders.h"
 //#include "Servomotor.h"
 #include "ButtonUrgence.h"
+#include "Tirette.h"
 
 enum RobotState {
     IDLE,             

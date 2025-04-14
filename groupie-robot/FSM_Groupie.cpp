@@ -41,6 +41,10 @@ void FSM::handleState() {
     
     long distance1 = getDistance(1); // Distance du capteur 1
     long distance2 = getDistance(2); // Distance du capteur 2
+    Serial.println(distance1);
+    Serial.println(distance2);
+
+
     
     Serial.print("Ticks G : ");
     Serial.print(getLeftCount());
@@ -133,6 +137,7 @@ void FSM::handleState() {
 }
 
 void FSM::evitementObstacle() {
+    Serial.println("Evittement");
     resetCounts();
     turnLeft();
 
