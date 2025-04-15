@@ -6,20 +6,17 @@
 #include "Ultrasonic.h"
 #include "LCD.h"
 #include "ServoArms.h"
+#include "Encoders.h"
+#include "Motion.h"
 
 enum RobotState {
     INIT,
-    MOVE_ARMS,
-    OPEN_HANDS,
     MOVE_TO_FIRST,
-    GRAB_MATERIALS,
-    MOVE_TO_CONSTRUCTION,
-    BUILD_BLEACHER,
-    MOVE_TO_SECOND,
+    TESTS_STATE,
+    DROP_BANNER,
     GO_HOME,
     PAUSE,
-    AVOID_OBSTACLE,
-    TESTS_STATE
+    AVOID_OBSTACLE
 };
 
 class FSM {
@@ -36,7 +33,7 @@ private:
 
     unsigned long startTime;
     unsigned long obstacle_treshold;
-    bool secondIsBuilt;
+    bool isYellow;
 
 
     bool isMoving;

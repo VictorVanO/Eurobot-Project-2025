@@ -15,9 +15,9 @@ void LCD::init() {
     lcd->backlight();
     lcd->clear();
     lcd->setCursor(3, 0);
-    lcd->print("Spice Bot");
+    lcd->print("Total points");
     lcd->setCursor(2, 1);
-    lcd->print("Demarrage...");
+    lcd->print("0.");
 }
 
 void LCD::clear() {

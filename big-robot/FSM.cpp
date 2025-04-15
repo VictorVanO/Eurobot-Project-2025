@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(20), secondIsBuilt(false), armsFullyExtended(false),
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(20), isYellow(false), armsFullyExtended(false),
              moveStartTime(0), moveDuration(0), isMovingBackward(false) {
     lcd = new LCD();
     arms = new ServoArms();
@@ -13,6 +13,7 @@ FSM::~FSM() {
 
 void FSM::init() {
     initMotors();
+    initEncoders();
     initUltrasonic();
     lcd->init();
     arms->init();
@@ -148,27 +149,9 @@ void FSM::handleState() {
         case INIT:
             Serial.println("State: INIT");
             if (startTime == 0) startTime = millis();
-            state = MOVE_TO_FIRST;
-            break;
-
-        case MOVE_ARMS:
-            Serial.println("State: Move Arms");
-            if (armsFullyExtended != true) {
-                arms->extendArms(); 
-                armsFullyExtended = true;
-                state = OPEN_HANDS;
-            } else {
-                arms->retractArms();
-                state = MOVE_TO_FIRST;
-            }
+            state = DROP_BANNER;
             break;
             
-        case OPEN_HANDS:
-            Serial.println("State: Open Hands");
-            arms->openHands(2);
-            state = MOVE_ARMS;
-            break;
-         
         case MOVE_TO_FIRST:
             if (moveStartTime == 0) {
                 Serial.println("State: MOVE TO FIRST");
@@ -183,39 +166,35 @@ void FSM::handleState() {
             }
             break;
         
-        case GRAB_MATERIALS:
-            Serial.println("State: Grab Materials");
-            stopMotors();
-            arms->grabMaterials();
-            state = MOVE_TO_CONSTRUCTION;
-            break;
-
-        case MOVE_TO_CONSTRUCTION:
-            if (!secondIsBuilt) {
-                Serial.println("Moving to construction site");
-                startTimedMovement(turnRight, 185, 120, BUILD_BLEACHER);
-            } else {
-                stopMotors();
-                state = BUILD_BLEACHER;
-            }
-            break;
-            
-        case BUILD_BLEACHER:
-            if (!secondIsBuilt) {
-                secondIsBuilt = true;
-                state = MOVE_TO_SECOND;
-            } else {
-                state = GO_HOME;
-            }
-            break;
-        
-        case MOVE_TO_SECOND:
-            startTimedMovement(turnLeft, 185, 100, GRAB_MATERIALS);
+        case DROP_BANNER:
+            Serial.println("State: DROP BANNER");
+            // Serial.println("State: Drop Banner");
+            // arms->openHands(2);
+            state = GO_HOME;
             break;
             
         case GO_HOME:
-            startTimedMovement(moveForward, 185, 1000, INIT);
-            break;
+            Serial.println("State: GO HOME");
+            // startTimedMovement(moveForward, 185, 1000, INIT);
+            if (isYellow) {
+                GoStraight(30);
+                GoStraight(-30);
+                smoothRotate(45,0);
+                GoStraight(120);
+                smoothRotate(45,0);
+                GoStraight(55);
+                break;
+            } else {
+                GoStraight(-30);
+                GoStraight(20);
+                smoothRotate(90,0);
+                GoStraight(8);
+                smoothRotate(90,0);
+                GoStraight(65);
+                smoothRotate(90,1);
+                GoStraight(107);
+                break;
+            }
 
         case PAUSE:
             Serial.println("State: PAUSE");
@@ -239,7 +218,7 @@ void FSM::handleState() {
                 case 0:
                     if (moveStartTime == 0) {
                         Serial.println("Starting backward movement for obstacle avoidance");
-                        startTimedMovement(moveBackward, 160, 1000, AVOID_OBSTACLE);
+                        startTimedMovement(moveBackward, 160, 700, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
@@ -248,28 +227,28 @@ void FSM::handleState() {
                     // obstacle detection or the obstacle detection was handled in the movement check
                     if (moveStartTime == 0) {
                         Serial.println("Starting right turn for obstacle avoidance");
-                        startTimedMovement(turnRight, 160, 600, AVOID_OBSTACLE);
+                        startTimedMovement(turnRight, 160, 700, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 2:
                     if (moveStartTime == 0) {
                         Serial.println("Starting forward movement for obstacle avoidance");
-                        startTimedMovement(moveForward, 220, 2000, AVOID_OBSTACLE);
+                        startTimedMovement(moveForward, 220, 4000, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 3:
                     if (moveStartTime == 0) {
                         Serial.println("Starting left turn for obstacle avoidance");
-                        startTimedMovement(turnLeft, 160, 1200, AVOID_OBSTACLE);
+                        startTimedMovement(turnLeft, 160, 1400, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;
                 case 4:
                     if (moveStartTime == 0) {
                         Serial.println("Starting second forward movement for obstacle avoidance");
-                        startTimedMovement(moveForward, 160, 2000, AVOID_OBSTACLE);
+                        startTimedMovement(moveForward, 160, 4000, AVOID_OBSTACLE);
                         avoidStep++;
                     }
                     break;

@@ -9,6 +9,12 @@ void initMotors() {
     pinMode(DIR_2, OUTPUT);
 }
 
+// For PID
+void setMotor(int dir, int pwmVal, int pwm, int pinDir) {
+    digitalWrite(pinDir, dir);
+    analogWrite(pwm, pwmVal);
+}
+
 void moveForward(int speed) {
     digitalWrite(DIR_1, 1);
     digitalWrite(DIR_2, 1);
