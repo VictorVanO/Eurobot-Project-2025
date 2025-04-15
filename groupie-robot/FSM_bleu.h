@@ -1,31 +1,27 @@
-#ifndef FSM_H
-#define FSM_H
+#ifndef FSM_BLEU_H
+#define FSM_BLEU_H
 
 #include "Motors.h"
 #include "Arduino.h"
 #include "Ultrasonic.h"
 #include "Infrared.h"
 #include "Encoders.h"
-//#include "Servomotor.h"
-#include "ButtonUrgence.h"
+
 #include "Tirette.h"
+#include "FSM_commun.h"
+#include "SwitchSelector.h"
+#include "ServoLed.h"
 
-enum RobotState {
-    IDLE,             
-    FOLLOW_LINE_STATE,  
-    AWAIT_OBSTACLE_STATE,
-    PARTY_STATE,
-    WAIT_CLEAR_STATE
-};
-
-class FSM {
+class FSM_bleu {
 public:
-    FSM();
+    FSM_bleu();
     void init();
     void run();
+    void autoriserDemarrage();
 
 private:
     RobotState state;
+    bool demarrageAutorise = false;
     unsigned long startTime;
     unsigned long globalTimer;
     int motorSpeed;
