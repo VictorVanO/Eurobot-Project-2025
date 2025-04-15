@@ -3,12 +3,12 @@
 FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(20), isYellow(false), armsFullyExtended(false),
              moveStartTime(0), moveDuration(0), isMovingBackward(false) {
     lcd = new LCD();
-    arms = new ServoArms();
+    // arms = new ServoArms();
 }
 
 FSM::~FSM() {
     delete lcd;
-    delete arms;
+    // delete arms;
 }
 
 void FSM::init() {
@@ -16,7 +16,7 @@ void FSM::init() {
     initEncoders();
     initUltrasonic();
     lcd->init();
-    arms->init();
+    // arms->init();
 }
 
 void FSM::run() {
