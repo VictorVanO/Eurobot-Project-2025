@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(20), isYellow(false), armsFullyExtended(false),
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(15), isYellow(true), armsFullyExtended(false),
              moveStartTime(0), moveDuration(0), isMovingBackward(false) {
     lcd = new LCD();
     // arms = new ServoArms();
@@ -162,7 +162,8 @@ void FSM::handleState() {
         case TESTS_STATE:
             if (moveStartTime == 0) {
                 Serial.println("State: TESTS");
-                startTimedMovement(moveForward, 160, 3000, MOVE_TO_FIRST);
+                // startTimedMovement(moveForward, 160, 3000, MOVE_TO_FIRST);
+                break;
             }
             break;
         
@@ -172,37 +173,103 @@ void FSM::handleState() {
             // arms->openHands(2);
             state = GO_HOME;
             break;
-            
+        
         case GO_HOME:
-            Serial.println("State: GO HOME");
-            // startTimedMovement(moveForward, 185, 1000, INIT);
-            if (isYellow) {
-                GoStraight(30);
-                GoStraight(-30);
-                smoothRotate(45,0);
-                GoStraight(120);
-                smoothRotate(45,0);
-                GoStraight(55);
-                break;
-            } else {
-                GoStraight(-30);
-                GoStraight(20);
-                smoothRotate(90,0);
-                GoStraight(8);
-                smoothRotate(90,0);
-                GoStraight(65);
-                smoothRotate(90,1);
-                GoStraight(107);
-                break;
-            }
+            Serial.println("State: GO_HOME");
+        
+            static int goHomeStep = 0;
+        
+            if (getCurrentMotionType() == MOTION_NONE) {
+                switch (goHomeStep) {
+                    case 0:
+                        if (isYellow) {
+                            startGoStraight(30);
+                        } else {
+                            startGoStraight(-30);
+                        }
+                        break;
+                    case 1:
+                        if (isYellow) {
+                            startGoStraight(-20);
+                        } else {
+                            startGoStraight(20);
+                        }
+                        break;
+                    case 2:
+                        if (isYellow) {
+                            startSmoothRotate(45, 0);
+                        } else {
+                            startSmoothRotate(90, 0);
+                        }
+                        break;
+                    case 3:
+                        if (isYellow) {
+                            startGoStraight(8);
+                        } else {
+                            startGoStraight(8);
+                        }
+                        break;
+                    case 4:
+                        if (isYellow) {
+                            startRotate(45);
+                        } else {
+                            startSmoothRotate(90, 0);
+                        }
+                        break;
+                    case 5:
+                        if (isYellow) {
+                            startGoStraight(55);
+                        } else {
+                            startGoStraight(58);
+                        }
+                        break;
+                    case 6:
+                        if (!isYellow) {
+                            startSmoothRotate(90, 1);
+                        }
+                        break;
+                    case 7:
+                        if (!isYellow) {
+                            startGoStraight(70);
+                            delay(5000);
+                            startGoStraight(87);
+                            delay(60000);
+                            startGoStraight(20);
+                        }
+                        break;
+                    case 8:
+                        Serial.println("GO_HOME finished. Returning to INIT.");
+                        goHomeStep = 0;
+                        state = TESTS_STATE;  // Ou autre état suivant
+                        break;
+                }
 
+                if (goHomeStep < 8) {
+                    goHomeStep++;
+                }
+            } else {
+                updateMotion();
+
+                if (isObstacleDetected()) {
+                    Serial.println("Obstacle detected during GO_HOME motion.");
+                    stopMotors();
+                    resetPIDVariables();
+                    previousState = GO_HOME;
+                    state = PAUSE;
+                    pauseStartTime = millis();
+                    return;
+                }
+            }
+            break;
+        
         case PAUSE:
             Serial.println("State: PAUSE");
             stopMotors();
             if (currentTime - pauseStartTime >= 3000) {
                 if (isObstacleDetected()) {
-                    state = AVOID_OBSTACLE;
-                    avoidStep = 0;  // Reset avoidance step counter
+                    // state = AVOID_OBSTACLE;
+                    // avoidStep = 0;  // Reset avoidance step counter
+                    state = PAUSE;
                 } else {
                     state = previousState;
                 }
