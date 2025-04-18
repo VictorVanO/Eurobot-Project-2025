@@ -5,7 +5,6 @@
 #include "Arduino.h"
 #include "Ultrasonic.h"
 #include "Servomotor.h"
-#include "ButtonUrgence.h"
 #include "SwitchSelector.h"
 #include "FSM_common.h"
 #include "Tirette.h"

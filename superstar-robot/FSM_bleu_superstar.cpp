@@ -20,7 +20,6 @@ void FSM_bleu::init() {
     initMotors();  // Initialiser les moteurs
     initUltrasonic();
     initServoLed();
-    initEmergencyButton();
     motorSpeed = 90;
     motorSpeed1 = 55;
     motorSpeed2 = 50;
@@ -35,7 +34,6 @@ void FSM_bleu::init() {
 
 // Exécution de la FSM
 void FSM_bleu::run() {
-    updateEmergencyState();
     handleState(); 
 }
 
@@ -47,11 +45,6 @@ void FSM_bleu::handleState() {
         return;
     }
     
-    if (isEmergencyActive()) {
-        Serial.println("Arrêt d'urgence activé !");
-        stopMotors();
-        while (1);  // Boucle infinie pour stopper définitivement le robot
-    }
     long distance1 = getDistance(1); // Distance du capteur 1
     long distance2 = getDistance(2); // Distance du capteur 2
 
@@ -63,7 +56,7 @@ void FSM_bleu::handleState() {
     Serial.print(distance2);
     Serial.println(" cm");
 
-    if (millis() - globalTimer >= 20000 && state != PARTY_STATE) {
+    if (millis() - globalTimer >= 100000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
         state = PARTY_STATE;
     }
@@ -72,7 +65,7 @@ void FSM_bleu::handleState() {
         case IDLE:
             Serial.println("État : IDLE");
             stopMotors();
-            if (millis() - startTime >= 5000){
+            if (millis() - startTime >= 85000){
               state = MOVE_FORWARD_STATE;
               startTime = millis();
             }
