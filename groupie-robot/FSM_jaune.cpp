@@ -55,7 +55,7 @@ void FSM_jaune::handleState() {
     // Serial.print(" | D : ");
     // Serial.println(getRightCount());
 
-    if (millis() - globalTimer >= 18000 && state != PARTY_STATE) {
+    if (millis() - globalTimer >= 100000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
         stopMotors();        
         unsigned long start = millis();
@@ -84,7 +84,7 @@ void FSM_jaune::handleState() {
         case IDLE:
             //  Serial.println("État : IDLE");
             stopMotors();
-            if (millis() - startTime >= 3000){
+            if (millis() - startTime >= 85000){
                 state = FOLLOW_LINE_STATE;
                 startTime = millis();
             }
