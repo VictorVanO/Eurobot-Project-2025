@@ -1,6 +1,8 @@
 #ifndef FSM_H
 #define FSM_H
 
+#define ZIPPER_PIN 8
+
 #include <Arduino.h>
 #include "Motors.h"
 #include "Ultrasonic.h"
@@ -31,10 +33,11 @@ private:
     RobotState previousState;
     RobotState nextState;
 
+    bool zipperPulled;
+    
     unsigned long startTime;
     unsigned long obstacle_treshold;
     bool isYellow;
-
 
     bool isMoving;
     bool isMovingBackward;
@@ -43,7 +46,6 @@ private:
     bool armsFullyExtended;
 
     LCD* lcd;
-    ServoArms* arms;
 
     bool isObstacleDetected();
     void handleState();

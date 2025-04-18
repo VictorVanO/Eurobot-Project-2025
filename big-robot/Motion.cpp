@@ -1,3 +1,5 @@
+// Motion.cpp - Non-blocking version of motion functions using FSM-style state updates
+
 #include <Arduino.h>
 #include "Motors.h"
 #include "Encoders.h"
@@ -20,12 +22,21 @@ static int neutralTimeout = 200;
 static bool leftDone = false, rightDone = false;
 static unsigned long neutralStartL = 0, neutralStartR = 0;
 
+// For GO_HOME recovery
+static float resumeTargetLeft = 0;
+static float resumeTargetRight = 0;
+static bool resumeRightWheelOnly = false;
+static bool resumeSmoothRotate = false;
+
 void startGoStraight(float distance_cm) {
     resetEncoders();
     resetPIDVariables();
     currentMotion = MOTION_STRAIGHT;
     targetLeft = distance_cm * 80.0;
     targetRight = distance_cm * 80.0;
+    resumeTargetLeft = targetLeft;
+    resumeTargetRight = targetRight;
+    resumeSmoothRotate = false;
     motionActive = true;
 }
 
@@ -36,6 +47,9 @@ void startRotate(long angle_deg) {
     float ticks = angle_deg * 14.75;
     targetLeft = ticks;
     targetRight = -ticks;
+    resumeTargetLeft = targetLeft;
+    resumeTargetRight = targetRight;
+    resumeSmoothRotate = false;
     motionActive = true;
 }
 
@@ -51,7 +65,26 @@ void startSmoothRotate(long angle_deg, bool rightWheel) {
         targetLeft = (angle_deg > 0 ? ticks : -ticks);
         targetRight = 0;
     }
+    resumeTargetLeft = targetLeft;
+    resumeTargetRight = targetRight;
+    resumeRightWheelOnly = rightWheel;
+    resumeSmoothRotate = true;
     motionActive = true;
+}
+
+void resumeMotion() {
+    resetEncoders();
+    resetPIDVariables();
+    targetLeft = resumeTargetLeft;
+    targetRight = resumeTargetRight;
+    motionActive = true;
+    if (resumeSmoothRotate) {
+        currentMotion = MOTION_SMOOTH_ROTATE;
+    } else if (resumeTargetLeft == resumeTargetRight) {
+        currentMotion = MOTION_STRAIGHT;
+    } else {
+        currentMotion = MOTION_ROTATE;
+    }
 }
 
 void updateMotion() {

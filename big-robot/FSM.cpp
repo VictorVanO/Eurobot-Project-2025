@@ -1,22 +1,20 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(15), isYellow(true), armsFullyExtended(false),
-             moveStartTime(0), moveDuration(0), isMovingBackward(false) {
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(15), isYellow(false), armsFullyExtended(false),
+             moveStartTime(0), moveDuration(0), isMovingBackward(false), zipperPulled(false) {
     lcd = new LCD();
-    // arms = new ServoArms();
 }
 
 FSM::~FSM() {
     delete lcd;
-    // delete arms;
 }
 
 void FSM::init() {
+    pinMode(ZIPPER_PIN, INPUT_PULLUP);
     initMotors();
     initEncoders();
     initUltrasonic();
     lcd->init();
-    // arms->init();
 }
 
 void FSM::run() {
@@ -71,7 +69,7 @@ bool FSM::isObstacleDetected() {
 void FSM::handleState() {
     unsigned long currentTime = millis();
     static unsigned long pauseStartTime = 0;
-    static int avoidStep = 0;  // Made static outside of the AVOID_OBSTACLE case
+    static int avoidStep = 0;
 
     // Check for obstacles while moving and handle accordingly
     if (moveStartTime > 0) {
@@ -148,8 +146,18 @@ void FSM::handleState() {
     switch (state) {
         case INIT:
             Serial.println("State: INIT");
-            if (startTime == 0) startTime = millis();
-            state = DROP_BANNER;
+            lcd->printLine(0, "INIT");
+            lcd->printLine(1, "Points: 0");
+
+            if (digitalRead(ZIPPER_PIN) == LOW) {
+                Serial.println("Tirette tirée ! Passage à DROP_BANNER");
+                zipperPulled = true;
+                if (startTime == 0) startTime = millis();
+                state = DROP_BANNER;
+                delay(100);
+            } else {
+                delay(100);  // Anti-spam
+            }
             break;
             
         case MOVE_TO_FIRST:
@@ -169,6 +177,8 @@ void FSM::handleState() {
         
         case DROP_BANNER:
             Serial.println("State: DROP BANNER");
+            lcd->printLine(0, "DROP BANNER");
+            lcd->printLine(1, "Points: 0");
             // Serial.println("State: Drop Banner");
             // arms->openHands(2);
             state = GO_HOME;
@@ -182,6 +192,8 @@ void FSM::handleState() {
             if (getCurrentMotionType() == MOTION_NONE) {
                 switch (goHomeStep) {
                     case 0:
+                        lcd->printLine(0, "Going Home...");
+                        lcd->printLine(1, "Points: 0");
                         if (isYellow) {
                             startGoStraight(30);
                         } else {
@@ -231,10 +243,9 @@ void FSM::handleState() {
                     case 7:
                         if (!isYellow) {
                             startGoStraight(70);
-                            delay(5000);
+                            delay(500);
                             startGoStraight(87);
-                            delay(60000);
-                            startGoStraight(20);
+                            lcd->printLine(1, "Points: 10");
                         }
                         break;
                     case 8:
@@ -271,6 +282,7 @@ void FSM::handleState() {
                     // avoidStep = 0;  // Reset avoidance step counter
                     state = PAUSE;
                 } else {
+                    resumeMotion();
                     state = previousState;
                 }
             }

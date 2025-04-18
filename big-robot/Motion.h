@@ -13,7 +13,8 @@ void startRotate(long angle_deg);
 void startSmoothRotate(long angle_deg, bool rightWheel);
 void updateMotion();
 bool isMotionComplete();
-void resetPIDVariables();
 MotionType getCurrentMotionType();
+void resumeMotion();
+void resetPIDVariables();
 
 #endif
