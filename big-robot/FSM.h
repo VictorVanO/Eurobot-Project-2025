@@ -44,6 +44,9 @@ private:
     unsigned long moveDuration;
     bool armsFullyExtended;
 
+    bool ultrasonicEnabled;
+
+
     LCD* lcd;
 
     bool isObstacleDetected();

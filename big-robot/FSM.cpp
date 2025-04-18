@@ -1,7 +1,7 @@
 #include "FSM.h"
 
 FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(8), isYellow(true), armsFullyExtended(false),
-             moveStartTime(0), moveDuration(0), isMovingBackward(false), zipperPulled(false) {
+             moveStartTime(0), moveDuration(0), isMovingBackward(false), zipperPulled(false), ultrasonicEnabled(true) {
     lcd = new LCD();
 }
 
@@ -33,7 +33,8 @@ void FSM::startTimedMovement(void (*moveFunction)(int), int speed, unsigned long
 }
 
 bool FSM::isObstacleDetected() {
-    // Check front sensors when moving forward
+    if (!ultrasonicEnabled) return false;
+    
     if (!isMovingBackward) {
         for (int i = FRONT_SENSORS_START; i < FRONT_SENSORS_START + NUM_FRONT_SENSORS; i++) {
             float distance = readDistance(i);
@@ -48,7 +49,6 @@ bool FSM::isObstacleDetected() {
         }
     }
 
-    // Check back sensors when moving backward
     if (isMovingBackward) {
         for (int i = BACK_SENSORS_START; i < BACK_SENSORS_START + NUM_BACK_SENSORS; i++) {
             float distance = readDistance(i);
@@ -68,84 +68,13 @@ bool FSM::isObstacleDetected() {
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
-    const unsigned long timeoutDelay = 92000;
+    const unsigned long timeOutDelay = 92000;
+    static bool goHomeWaitingForTimeout = false;
     static int goHomeStep = 0;
     static bool goHomeMotionStarted = false;
     static unsigned long pauseStartTime = 0;
     static int avoidStep = 0;
 
-    // Check for obstacles while moving and handle accordingly
-    if (moveStartTime > 0) {
-        // Check for obstacle detection during movement
-        if (isObstacleDetected()) {
-            Serial.print("Obstacle detected during ");
-            Serial.print(isMovingBackward ? "backward" : "forward");
-            Serial.print(" movement in state: ");
-            Serial.println(state);
-
-            // Special handling for AVOID_OBSTACLE state
-            if (state == AVOID_OBSTACLE) {
-                Serial.print("Stopping during avoidance step: ");
-                Serial.println(avoidStep);
-                
-                stopMotors();
-                moveStartTime = 0;
-                
-                // For backward movement (step 0), skip to step 1
-                if (avoidStep == 0 && isMovingBackward) {
-                    Serial.println("Skipping backward step due to obstacle");
-                    avoidStep = 1;
-                } 
-                // For forward movement (step 2 or 4), try a different direction
-                else if ((avoidStep == 2 || avoidStep == 4) && !isMovingBackward) {
-                    Serial.println("Trying alternative avoidance path");
-                    // If we hit an obstacle during forward movement, turn more
-                    avoidStep = 1;  // Go back to turning step
-                }
-                // For turning movements, just proceed to next step
-                else {
-                    avoidStep++;
-                    if (avoidStep > 5) {
-                        avoidStep = 0;
-                        state = previousState;
-                    }
-                }
-                
-                isMovingBackward = false;
-                return;
-            }
-            // Regular obstacle handling for other states
-            else if (state != PAUSE) {
-                Serial.println("Regular obstacle handling");
-                stopMotors();
-                moveStartTime = 0;
-                isMovingBackward = false;
-                previousState = state;
-                state = PAUSE;
-                pauseStartTime = currentTime;
-                return;
-            }
-        }
-        
-        // Stop motors when movement is finished
-        if (currentTime - moveStartTime >= moveDuration) {
-            stopMotors();
-            moveStartTime = 0;
-            isMovingBackward = false;
-            
-            if (state == AVOID_OBSTACLE) {
-                // Stay in AVOID_OBSTACLE state but move to next step
-                // The next state will be set when all avoidance steps are complete
-            } else {
-                state = nextState;
-            }
-            return;
-        }
-        
-        return;
-    }
-
-    // Main state machine logic
     switch (state) {
         case INIT:
             Serial.println("State: INIT");
@@ -192,7 +121,7 @@ void FSM::handleState() {
                         lcd->printLine(0, "Going Home...");
                         lcd->printLine(1, "Points: 0");
                         if (isYellow) {
-                            obstacle_treshold = 0.01;
+                            ultrasonicEnabled = false;
                             startGoStraight(30);
                         } else {
                             startGoStraight(-30);
@@ -200,7 +129,6 @@ void FSM::handleState() {
                         break;
                     case 1:
                         if (isYellow) {
-                            obstacle_treshold = 8;
                             startGoStraight(-30);
                         } else {
                             startGoStraight(20);
@@ -229,9 +157,15 @@ void FSM::handleState() {
                         break;
                     case 5:
                         if (isYellow) {
-                            delay(70000);
-                            startGoStraight(35);
-                            lcd->printLine(1, "Points: 10");
+                            if (!goHomeWaitingForTimeout) {
+                                if (currentTime - startTime >= timeOutDelay) {
+                                    startGoStraight(35);
+                                    lcd->printLine(1, "Points: 10");
+                                    goHomeWaitingForTimeout = true;
+                                } else {
+                                    return;
+                                }
+                            }
                         } else {
                             startGoStraight(55);
                         }
@@ -244,13 +178,19 @@ void FSM::handleState() {
                     case 7:
                         if (!isYellow) {
                             startGoStraight(62);
-                            lcd->printLine(1, "Points: 10");
                         }
                         break;
                     case 8:
                         if (!isYellow) {
-                            if (currentTime - startTime >= timeoutDelay) {
-                                startGoStraight(10);
+                            if (!goHomeWaitingForTimeout) {
+                                if (currentTime - startTime >= timeOutDelay) {
+                                    startGoStraight(10);
+                                    lcd->printLine(1, "Points: 10");
+                                    goHomeWaitingForTimeout = true;
+                                } else {
+                                    return;
+                                }
+                            }
                         }
                         break;
                     case 9:
@@ -277,8 +217,8 @@ void FSM::handleState() {
                 return;
             }
         
-            // If motion is complete, move to the next step
             if (isMotionComplete()) {
+                ultrasonicEnabled = true;
                 goHomeStep++;
                 goHomeMotionStarted = false;
             }
