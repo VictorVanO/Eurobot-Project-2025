@@ -129,6 +129,7 @@ void FSM::handleState() {
                         break;
                     case 1:
                         if (isYellow) {
+                            ultrasonicEnabled = false;
                             startGoStraight(-30);
                         } else {
                             startGoStraight(20);
@@ -143,7 +144,7 @@ void FSM::handleState() {
                         break;
                     case 3:
                         if (isYellow) {
-                            startGoStraight(115);
+                            startGoStraight(112);
                         } else {
                             startGoStraight(11);
                         }
@@ -159,7 +160,7 @@ void FSM::handleState() {
                         if (isYellow) {
                             if (!goHomeWaitingForTimeout) {
                                 if (currentTime - startTime >= timeOutDelay) {
-                                    startGoStraight(35);
+                                    startGoStraight(40);
                                     lcd->printLine(1, "Points: 10");
                                     goHomeWaitingForTimeout = true;
                                 } else {
