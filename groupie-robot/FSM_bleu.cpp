@@ -60,7 +60,7 @@ void FSM_bleu::handleState() {
         unsigned long start = millis();
         Servo servo;
         servo.attach(4);
-        while (millis() - start < 10000) {
+        while (millis() - start < 50000) {
             stopMotors();
             for (int angle = 0; angle <= 180; angle++) {
                 servo.write(angle);
