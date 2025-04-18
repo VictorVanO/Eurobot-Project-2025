@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(15), isYellow(false), armsFullyExtended(false),
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(8), isYellow(true), armsFullyExtended(false),
              moveStartTime(0), moveDuration(0), isMovingBackward(false), zipperPulled(false) {
     lcd = new LCD();
 }
@@ -68,6 +68,9 @@ bool FSM::isObstacleDetected() {
 
 void FSM::handleState() {
     unsigned long currentTime = millis();
+    const unsigned long timeoutDelay = 92000;
+    static int goHomeStep = 0;
+    static bool goHomeMotionStarted = false;
     static unsigned long pauseStartTime = 0;
     static int avoidStep = 0;
 
@@ -159,17 +162,12 @@ void FSM::handleState() {
                 delay(100);  // Anti-spam
             }
             break;
-            
-        case MOVE_TO_FIRST:
-            if (moveStartTime == 0) {
-                Serial.println("State: MOVE TO FIRST");
-                startTimedMovement(moveForward, 220, 3000, TESTS_STATE);
-            }
-            break;
 
         case TESTS_STATE:
             if (moveStartTime == 0) {
                 Serial.println("State: TESTS");
+                lcd->printLine(0, "FINISH");
+                lcd->printLine(1, "Points: 10");
                 // startTimedMovement(moveForward, 160, 3000, MOVE_TO_FIRST);
                 break;
             }
@@ -183,18 +181,18 @@ void FSM::handleState() {
             // arms->openHands(2);
             state = GO_HOME;
             break;
-        
+
         case GO_HOME:
             Serial.println("State: GO_HOME");
         
-            static int goHomeStep = 0;
-        
-            if (getCurrentMotionType() == MOTION_NONE) {
+            // Start motion only once per step
+            if (!goHomeMotionStarted) {
                 switch (goHomeStep) {
                     case 0:
                         lcd->printLine(0, "Going Home...");
                         lcd->printLine(1, "Points: 0");
                         if (isYellow) {
+                            obstacle_treshold = 0.01;
                             startGoStraight(30);
                         } else {
                             startGoStraight(-30);
@@ -202,7 +200,8 @@ void FSM::handleState() {
                         break;
                     case 1:
                         if (isYellow) {
-                            startGoStraight(-20);
+                            obstacle_treshold = 8;
+                            startGoStraight(-30);
                         } else {
                             startGoStraight(20);
                         }
@@ -216,23 +215,25 @@ void FSM::handleState() {
                         break;
                     case 3:
                         if (isYellow) {
-                            startGoStraight(8);
+                            startGoStraight(115);
                         } else {
-                            startGoStraight(8);
+                            startGoStraight(11);
                         }
                         break;
                     case 4:
                         if (isYellow) {
-                            startRotate(45);
+                            startSmoothRotate(45,0);
                         } else {
                             startSmoothRotate(90, 0);
                         }
                         break;
                     case 5:
                         if (isYellow) {
-                            startGoStraight(55);
+                            delay(70000);
+                            startGoStraight(35);
+                            lcd->printLine(1, "Points: 10");
                         } else {
-                            startGoStraight(58);
+                            startGoStraight(55);
                         }
                         break;
                     case 6:
@@ -242,41 +243,51 @@ void FSM::handleState() {
                         break;
                     case 7:
                         if (!isYellow) {
-                            startGoStraight(70);
-                            delay(500);
-                            startGoStraight(87);
+                            startGoStraight(62);
                             lcd->printLine(1, "Points: 10");
                         }
                         break;
                     case 8:
+                        if (!isYellow) {
+                            if (currentTime - startTime >= timeoutDelay) {
+                                startGoStraight(10);
+                        }
+                        break;
+                    case 9:
                         Serial.println("GO_HOME finished. Returning to INIT.");
                         goHomeStep = 0;
-                        state = TESTS_STATE;  // Ou autre état suivant
+                        goHomeMotionStarted = false;
+                        state = TESTS_STATE;
                         break;
                 }
-
-                if (goHomeStep < 8) {
-                    goHomeStep++;
-                }
-            } else {
-                updateMotion();
-
-                if (isObstacleDetected()) {
-                    Serial.println("Obstacle detected during GO_HOME motion.");
-                    stopMotors();
-                    resetPIDVariables();
-                    previousState = GO_HOME;
-                    state = PAUSE;
-                    pauseStartTime = millis();
-                    return;
-                }
+                goHomeMotionStarted = true;
             }
-            break;
+        
+            // Keep updating the motion
+            updateMotion();
+        
+            // Check for obstacle
+            if (isObstacleDetected()) {
+                Serial.println("Obstacle detected during GO_HOME step. Pausing.");
+                stopMotors();
+                resetPIDVariables();
+                previousState = GO_HOME;
+                state = PAUSE;
+                pauseStartTime = millis();
+                return;
+            }
+        
+            // If motion is complete, move to the next step
+            if (isMotionComplete()) {
+                goHomeStep++;
+                goHomeMotionStarted = false;
+            }
+            break;        
         
         case PAUSE:
             Serial.println("State: PAUSE");
             stopMotors();
-            if (currentTime - pauseStartTime >= 3000) {
+            if (currentTime - pauseStartTime >= 2000) {
                 if (isObstacleDetected()) {
                     // state = AVOID_OBSTACLE;
                     // avoidStep = 0;  // Reset avoidance step counter

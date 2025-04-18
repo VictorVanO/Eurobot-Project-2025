@@ -73,10 +73,11 @@ void startSmoothRotate(long angle_deg, bool rightWheel) {
 }
 
 void resumeMotion() {
-    resetEncoders();
-    resetPIDVariables();
-    targetLeft = resumeTargetLeft;
-    targetRight = resumeTargetRight;
+    //resetEncoders();
+    //resetPIDVariables();
+
+    //targetLeft = resumeTargetLeft;
+    //targetRight = resumeTargetRight;
     motionActive = true;
     if (resumeSmoothRotate) {
         currentMotion = MOTION_SMOOTH_ROTATE;

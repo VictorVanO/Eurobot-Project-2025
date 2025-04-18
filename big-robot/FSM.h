@@ -13,7 +13,6 @@
 
 enum RobotState {
     INIT,
-    MOVE_TO_FIRST,
     TESTS_STATE,
     DROP_BANNER,
     GO_HOME,
