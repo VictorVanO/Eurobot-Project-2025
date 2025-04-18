@@ -10,6 +10,7 @@
 #include "ServoArms.h"
 #include "Encoders.h"
 #include "Motion.h"
+#include "ServoControl.h"
 
 enum RobotState {
     INIT,

@@ -1,6 +1,6 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(8), isYellow(true), armsFullyExtended(false),
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(8), isYellow(false), armsFullyExtended(false),
              moveStartTime(0), moveDuration(0), isMovingBackward(false), zipperPulled(false), ultrasonicEnabled(true) {
     lcd = new LCD();
 }
@@ -14,6 +14,7 @@ void FSM::init() {
     initMotors();
     initEncoders();
     initUltrasonic();
+    initServomotors();
     lcd->init();
 }
 
@@ -107,7 +108,6 @@ void FSM::handleState() {
             lcd->printLine(0, "DROP BANNER");
             lcd->printLine(1, "Points: 0");
             // Serial.println("State: Drop Banner");
-            // arms->openHands(2);
             state = GO_HOME;
             break;
 
@@ -121,17 +121,21 @@ void FSM::handleState() {
                         lcd->printLine(0, "Going Home...");
                         lcd->printLine(1, "Points: 0");
                         if (isYellow) {
+                            openGripper(0);
                             ultrasonicEnabled = false;
                             startGoStraight(30);
                         } else {
+                            openGripper(1);
                             startGoStraight(-30);
                         }
                         break;
                     case 1:
                         if (isYellow) {
+                            openGripper(1);
                             ultrasonicEnabled = false;
                             startGoStraight(-30);
                         } else {
+                            openGripper(0);
                             startGoStraight(20);
                         }
                         break;
