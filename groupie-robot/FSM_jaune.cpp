@@ -182,7 +182,7 @@ void FSM_jaune::evitementObstacle() {
     }
     stopMotors();
 
-    ticksRotation = getLeftCount();
+    ticksRotation = getLeftCount() + 7;
     delay(300);
     avoidStep = AVOID_TURN_LEFT_DONE;
 

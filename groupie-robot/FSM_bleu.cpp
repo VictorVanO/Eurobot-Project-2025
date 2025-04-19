@@ -60,13 +60,13 @@ void FSM_bleu::handleState() {
         unsigned long start = millis();
         Servo servo;
         servo.attach(4);
-        while (millis() - start < 50000) {
+        while (millis() - start < 850000) {
             stopMotors();
-            for (int angle = 0; angle <= 180; angle++) {
+            for (int angle = 0; angle <= 90; angle++) {
                 servo.write(angle);
                 delay(10);
             }
-            for (int angle = 180; angle >= 0; angle--) {
+            for (int angle = 90; angle >= 0; angle--) {
                 servo.write(angle);
                 delay(10);
             }
@@ -84,7 +84,7 @@ void FSM_bleu::handleState() {
         case IDLE:
             //  Serial.println("État : IDLE");
             stopMotors();
-            if (millis() - startTime >= 85000){
+            if (millis() - startTime >= 5000){
                 state = FOLLOW_LINE_STATE;
                 startTime = millis();
             }
