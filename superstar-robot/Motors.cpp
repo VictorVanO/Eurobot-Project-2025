@@ -11,7 +11,7 @@ void initMotors() {
 
 void setMotorsSpeed(uint8_t speed) {
   motor1->setSpeed(speed);
-  motor2->setSpeed(speed - 11);
+  motor2->setSpeed(speed - 20);
 }
 
 void runMotors(uint8_t direction) {

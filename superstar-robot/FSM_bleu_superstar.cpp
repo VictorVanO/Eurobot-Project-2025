@@ -65,7 +65,7 @@ void FSM_bleu::handleState() {
         case IDLE:
             Serial.println("État : IDLE");
             stopMotors();
-            if (millis() - startTime >= 85000){
+            if (millis() - startTime >= 5000){
               state = MOVE_FORWARD_STATE;
               startTime = millis();
             }
