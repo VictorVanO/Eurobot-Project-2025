@@ -61,7 +61,7 @@ void FSM_jaune::handleState() {
         unsigned long start = millis();
         Servo servo;
         servo.attach(4);
-        while (millis() - start < 10000) {
+        while (millis() - start < 85000) {
             stopMotors();
             for (int angle = 0; angle <= 90; angle++) {
                 servo.write(angle);
@@ -84,7 +84,7 @@ void FSM_jaune::handleState() {
         case IDLE:
             //  Serial.println("État : IDLE");
             stopMotors();
-            if (millis() - startTime >= 85000){
+            if (millis() - startTime >= 87000){
                 state = FOLLOW_LINE_STATE;
                 startTime = millis();
             }
@@ -95,8 +95,8 @@ void FSM_jaune::handleState() {
                 if (distance1 <= 9 || distance2 <= 9) {
                     state = AWAIT_OBSTACLE_STATE;
                 }
-                if (millis() - startTime >= 13000){
-                        while(millis() - startTime<15000){
+                if (millis() - startTime >= 11000){
+                        while(millis() - startTime<13000){
                             turnRight();
                             goForward();
                         }
