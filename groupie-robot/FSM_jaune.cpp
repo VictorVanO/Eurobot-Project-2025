@@ -24,7 +24,7 @@ void FSM_jaune::init() {
     initUltrasonic();
     initEncoders();
     //initServoLed();
-    motorSpeed =68;
+    motorSpeed =70;
     setMotorsSpeed(motorSpeed);
     state = IDLE; 
     startTime = millis();
@@ -61,7 +61,7 @@ void FSM_jaune::handleState() {
         unsigned long start = millis();
         Servo servo;
         servo.attach(4);
-        while (millis() - start < 85000) {
+        while (millis() - start < 87000) {
             stopMotors();
             for (int angle = 0; angle <= 90; angle++) {
                 servo.write(angle);
