@@ -24,7 +24,7 @@ void FSM_jaune::init() {
     initUltrasonic();
     initEncoders();
     //initServoLed();
-    motorSpeed =65;
+    motorSpeed =68;
     setMotorsSpeed(motorSpeed);
     state = IDLE; 
     startTime = millis();
@@ -92,15 +92,15 @@ void FSM_jaune::handleState() {
 
             case FOLLOW_LINE_STATE:
 
-                if (distance1 <= 9 || distance2 <= 9) {
-                    state = AWAIT_OBSTACLE_STATE;
-                }
-                if (millis() - startTime >= 11000){
-                        while(millis() - startTime<13000){
-                            turnRight();
-                            goForward();
-                        }
-                    }
+                //if (distance1 <= 4 || distance2 <= 4) {
+                    //state = AWAIT_OBSTACLE_STATE;
+                //}
+                //if (millis() - startTime >= 11000){
+                        //while(millis() - startTime<13000){
+                            //turnRight();
+                            //goForward();
+                        //}
+                    //}
                 
         
                 switch (returnDirection()) {
@@ -127,11 +127,11 @@ void FSM_jaune::handleState() {
             distance1 = getDistance(1);
             distance2 = getDistance(2);
 
-            if (distance1 >= 9 && distance2 >= 9) {  
+            if (distance1 >= 4 && distance2 >= 4) {  
                 state = FOLLOW_LINE_STATE;
             }
 
-            evitementObstacle();
+            //evitementObstacle();
             break;
 
         case WAIT_CLEAR_STATE:

@@ -20,7 +20,7 @@ void setup() {
     if (selector.isPrimaryMode()) {
         Serial.println("FSM_bleu");
         useBlue = true;
-        fsmBleu.init(); 
+        fsmJaune.init(); 
     } else {
         Serial.println("FSM_jaune");
         useBlue = false;
