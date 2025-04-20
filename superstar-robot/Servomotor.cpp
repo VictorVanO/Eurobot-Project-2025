@@ -4,7 +4,7 @@
 
 Servo myServo;
 
-const int durationParty = 50000;  
+const int durationParty = 500000;  
 unsigned long partyStartTime;     
 
 void initServoLed() {
