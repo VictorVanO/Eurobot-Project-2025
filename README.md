@@ -74,7 +74,11 @@ The Big Robot should be able to do 2 actions in order to score points :
 7. The robot places the second construction on the starting zone
 8. The robot makes a 180° turn and goes to the final construction zone
 
+### Big Robot : Schematic wiring
 
+This is the schematic circuit of the big robot :
+
+![Schematic wiring of the big robot](/images/Schematic_Wiring-Big-Robot.png)
 
 ### Big Robot : Arms
 The Big Robot features a deployable structure equipped with two arms on top of the robot, each fitted with a gripper. These arms are used to place the banner and move the stands to the designated area.
