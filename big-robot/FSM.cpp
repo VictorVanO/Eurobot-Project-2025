@@ -192,10 +192,8 @@ void FSM::handleState() {
                 goHomeMotionStarted = true;
             }
         
-            // Keep updating the motion
             updateMotion();
         
-            // Check for obstacle
             if (isObstacleDetected()) {
                 Serial.println("Obstacle detected during GO_HOME step. Pausing.");
                 stopMotors();

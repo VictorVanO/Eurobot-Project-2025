@@ -1,5 +1,3 @@
-// Motion.cpp - Non-blocking version of motion functions using FSM-style state updates
-
 #include <Arduino.h>
 #include "Motors.h"
 #include "Encoders.h"
@@ -57,7 +55,7 @@ void startSmoothRotate(long angle_deg, bool rightWheel) {
     resetEncoders();
     resetPIDVariables();
     currentMotion = MOTION_SMOOTH_ROTATE;
-    float ticks = abs(angle_deg) * 29.5; // Adjust this factor as needed
+    float ticks = abs(angle_deg) * 29.5;
     if (rightWheel) {
         targetLeft = 0;
         targetRight = (angle_deg > 0 ? ticks : -ticks);
@@ -73,11 +71,6 @@ void startSmoothRotate(long angle_deg, bool rightWheel) {
 }
 
 void resumeMotion() {
-    //resetEncoders();
-    //resetPIDVariables();
-
-    //targetLeft = resumeTargetLeft;
-    //targetRight = resumeTargetRight;
     motionActive = true;
     if (resumeSmoothRotate) {
         currentMotion = MOTION_SMOOTH_ROTATE;

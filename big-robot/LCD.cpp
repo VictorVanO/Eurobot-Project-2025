@@ -2,7 +2,6 @@
 #include <Arduino.h>
 
 LCD::LCD() {
-    // Using the 0x3F address from your sample code
     lcd = new LiquidCrystal_I2C(0x3F, 20, 4);
 }
 
@@ -26,14 +25,14 @@ void LCD::clear() {
 
 void LCD::printLine(int line, const char* message) {
     lcd->setCursor(0, line);
-    lcd->print("                    "); // Clear the line (20 spaces)
+    lcd->print("                    ");
     lcd->setCursor(0, line);
     lcd->print(message);
 }
 
 void LCD::printLineWithInt(int line, const char* message, int value) {
     lcd->setCursor(0, line);
-    lcd->print("                    "); // Clear the line
+    lcd->print("                    ");
     lcd->setCursor(0, line);
     lcd->print(message);
     lcd->print(value);
@@ -41,7 +40,7 @@ void LCD::printLineWithInt(int line, const char* message, int value) {
 
 void LCD::printLineWithFloat(int line, const char* message, float value, int precision) {
     lcd->setCursor(0, line);
-    lcd->print("                    "); // Clear the line
+    lcd->print("                    ");
     lcd->setCursor(0, line);
     lcd->print(message);
     lcd->print(value, precision);
@@ -56,7 +55,7 @@ void LCD::displaySensorData(float* distances, int numSensors) {
     printLine(2, "Sensors:");
     
     String sensorData = "";
-    for (int i = 0; i < numSensors && i < 3; i++) { // Display up to 3 sensors
+    for (int i = 0; i < numSensors && i < 3; i++) {
         if (i > 0) sensorData += " ";
         sensorData += String(distances[i], 1);
     }

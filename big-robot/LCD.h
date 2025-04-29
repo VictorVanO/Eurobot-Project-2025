@@ -21,4 +21,4 @@ public:
     void backlight(bool on = true);
 };
 
-#endif // LCD_H
+#endif
