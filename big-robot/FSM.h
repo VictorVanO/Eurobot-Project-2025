@@ -14,7 +14,6 @@
 
 enum RobotState {
     INIT,
-    TESTS_STATE,
     DROP_BANNER,
     GO_HOME,
     PAUSE,
@@ -40,18 +39,13 @@ private:
 
     bool isMoving;
     bool isMovingBackward;
-    unsigned long moveStartTime;
-    unsigned long moveDuration;
-    bool armsFullyExtended;
 
     bool ultrasonicEnabled;
-
 
     LCD* lcd;
 
     bool isObstacleDetected();
     void handleState();
-    void startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration, RobotState next);
 };
 
 #endif

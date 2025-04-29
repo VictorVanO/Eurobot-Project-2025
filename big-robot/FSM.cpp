@@ -1,7 +1,7 @@
 #include "FSM.h"
 
-FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(8), isYellow(false), armsFullyExtended(false),
-             moveStartTime(0), moveDuration(0), isMovingBackward(false), zipperPulled(false), ultrasonicEnabled(true) {
+FSM::FSM() : state(INIT), startTime(0), obstacle_treshold(8), isYellow(false),
+             isMovingBackward(false), zipperPulled(false), ultrasonicEnabled(true) {
     lcd = new LCD();
 }
 
@@ -20,17 +20,6 @@ void FSM::init() {
 
 void FSM::run() {
     handleState();
-}
-
-void FSM::startTimedMovement(void (*moveFunction)(int), int speed, unsigned long duration, RobotState next) {
-    // Determine if the robot is moving backward
-    isMovingBackward = (moveFunction == moveBackward);
-
-    // Start the movement
-    moveFunction(speed);
-    moveStartTime = millis();
-    moveDuration = duration;
-    nextState = next;
 }
 
 bool FSM::isObstacleDetected() {
@@ -88,16 +77,12 @@ void FSM::handleState() {
                 state = DROP_BANNER;
                 delay(100);
             } else {
-                delay(100);  // Anti-spam
+                // Anti-spam delay
+                delay(100);
             }
-            break;
 
-        case TESTS_STATE:
-            if (moveStartTime == 0) {
-                Serial.println("State: TESTS");
-                lcd->printLine(0, "FINISH");
-                lcd->printLine(1, "Points: 10");
-                // startTimedMovement(moveForward, 160, 3000, MOVE_TO_FIRST);
+            // Stop the robot
+            if (previousState == GO_HOME) {
                 break;
             }
             break;
@@ -106,7 +91,6 @@ void FSM::handleState() {
             Serial.println("State: DROP BANNER");
             lcd->printLine(0, "DROP BANNER");
             lcd->printLine(1, "Points: 0");
-            // Serial.println("State: Drop Banner");
             state = GO_HOME;
             break;
 
@@ -188,7 +172,7 @@ void FSM::handleState() {
                         if (!isYellow) {
                             if (!goHomeWaitingForTimeout) {
                                 if (currentTime - startTime >= timeOutDelay) {
-                                    startGoStraight(10);
+                                    startGoStraight(30);
                                     lcd->printLine(1, "Points: 10");
                                     goHomeWaitingForTimeout = true;
                                 } else {
@@ -201,7 +185,8 @@ void FSM::handleState() {
                         Serial.println("GO_HOME finished. Returning to INIT.");
                         goHomeStep = 0;
                         goHomeMotionStarted = false;
-                        state = TESTS_STATE;
+                        previousState = state;
+                        state = INIT;
                         break;
                 }
                 goHomeMotionStarted = true;
