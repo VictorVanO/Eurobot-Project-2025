@@ -18,7 +18,6 @@ enum RobotState {
     DROP_BANNER,
     GO_HOME,
     PAUSE,
-    AVOID_OBSTACLE
 };
 
 class FSM {

@@ -74,7 +74,6 @@ void FSM::handleState() {
     static int goHomeStep = 0;
     static bool goHomeMotionStarted = false;
     static unsigned long pauseStartTime = 0;
-    static int avoidStep = 0;
 
     switch (state) {
         case INIT:
@@ -234,66 +233,11 @@ void FSM::handleState() {
             stopMotors();
             if (currentTime - pauseStartTime >= 2000) {
                 if (isObstacleDetected()) {
-                    // state = AVOID_OBSTACLE;
-                    // avoidStep = 0;  // Reset avoidance step counter
                     state = PAUSE;
                 } else {
                     resumeMotion();
                     state = previousState;
                 }
-            }
-            break;
-        
-        case AVOID_OBSTACLE:
-            Serial.println("State: AVOID OBSTACLE");
-            Serial.print("Avoid step: ");
-            Serial.println(avoidStep);
-
-            switch (avoidStep) {
-                case 0:
-                    if (moveStartTime == 0) {
-                        Serial.println("Starting backward movement for obstacle avoidance");
-                        startTimedMovement(moveBackward, 160, 700, AVOID_OBSTACLE);
-                        avoidStep++;
-                    }
-                    break;
-                case 1:
-                    // If we reach this point, it means the backward movement completed without
-                    // obstacle detection or the obstacle detection was handled in the movement check
-                    if (moveStartTime == 0) {
-                        Serial.println("Starting right turn for obstacle avoidance");
-                        startTimedMovement(turnRight, 160, 700, AVOID_OBSTACLE);
-                        avoidStep++;
-                    }
-                    break;
-                case 2:
-                    if (moveStartTime == 0) {
-                        Serial.println("Starting forward movement for obstacle avoidance");
-                        startTimedMovement(moveForward, 220, 4000, AVOID_OBSTACLE);
-                        avoidStep++;
-                    }
-                    break;
-                case 3:
-                    if (moveStartTime == 0) {
-                        Serial.println("Starting left turn for obstacle avoidance");
-                        startTimedMovement(turnLeft, 160, 1400, AVOID_OBSTACLE);
-                        avoidStep++;
-                    }
-                    break;
-                case 4:
-                    if (moveStartTime == 0) {
-                        Serial.println("Starting second forward movement for obstacle avoidance");
-                        startTimedMovement(moveForward, 160, 4000, AVOID_OBSTACLE);
-                        avoidStep++;
-                    }
-                    break;
-                case 5:
-                    if (moveStartTime == 0) {
-                        Serial.println("Starting final right turn to resume previous state");
-                        startTimedMovement(turnRight, 160, 600, previousState);
-                        avoidStep = 0;  // Reset for next time
-                    }
-                    break;
             }
             break;
     }
