@@ -11,8 +11,9 @@
 * [Getting started](#rocket-getting-started)
     * [Prerequesites](#exclamation-prerequesites)
 * [Big Robot](#car-big-robot)
-* [Superstar](#superstar)
-* [Groupie](#groupie)
+* [PAMI](#pami)
+    * [Superstar](#star2-superstar)
+    * [Groupie](#dancer-groupie)
 * [Tree structure](#deciduous_tree-tree-structure)
 
 # Project participants
@@ -82,18 +83,91 @@ The Big Robot should be able to do 2 actions in order to score points :
 7. The robot places the second construction on the starting zone
 8. The robot makes a 180° turn and goes to the final construction zone
 
-# Superstar
+## Schematic wiring
 
-## FSM
+This is the schematic circuit of the big robot :
+ 
+![Schematic wiring of the big robot](/images/Schematic_Wiring-Big-Robot.png)
+
+## Arms
+
+The Big Robot features a deployable structure equipped with two arms on top of the robot, each fitted with a gripper. These arms are used to place the banner and move the stands to the designated area.
+
+In the ```3D-Models/big-robot``` folder, you’ll find the STL files for the arm. The table below lists the different files with the total number of times each one needs to be printed to assemble both arms:
+
+| STL File          | Description                                  | Required Quantity |
+|-------------------|----------------------------------------------|-------------------|
+| base-part-1.stl   | Part n°1 of the arm base                     | 2                 |
+| base-part-2.stl   | Part n°2 of the arm base                     | 2                 |
+| base-part-3.stl   | Part n°3 of the arm base                     | 2                 |
+| base-bolt         | Bolt used to attach the arm to the base      | 2                 |
+| arm-1.stl         | 1st segment of the robotic arm               | 2                 |
+| arm-2.stl         | 2nd segment of the robotic arm               | 2                 |
+| gear-x3.stl       | Gear for the whole arm                       | 6                 |
+| arm-hub.stl       | 1st connector between base and 2nd arm joint | 2                 |
+| main-axle.stl     | 2nd connector between base and 2nd arm joint | 2                 |
+| middle-gear.stl   | Gear responsible for the arm movement        | 2                 |
+| middle-axle.stl   | Axis allowing the arm rotation               | 2                 |
+| clamp.stl         | Clamp to hold objects                        | 2                 |
+
+For this arm, we based our design on an existing project, which you can find via this [video](https://www.youtube.com/watch?v=YqrbWCVa3xA), including assembly instructions for the arm.
+
+# PAMI
+
+## Components
+ Here are the main components for ours PAMI's : 
+ - 1 x Arduino Adafruits
+ - 2 x HC-SR04 Ultrasonic sensors
+ - 2 x Infrared sensors
+ - 2 x DC Motors with corresponding wheels
+ - 1 x breadboard
+ - 1 x Emergency Button
+ - 2 x Optical encoders
+ - 1 x Servomotor
+ - 1 x LED
+
+# :star2: Superstar
+
+## :memo: Superstar FSM
 
 ![Finite-State Machine of the PAMI superstar.](/images/FSM-PAMI-Superstar.png)
 
-# Groupie
+## Sensors
 
-## FSM
+- **Distance Sensor (Ultrasonic)**  
+    Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
+
+## Strategy
+
+### Obstacle Avoidance
+When an obstacle is detected by the distance sensor, the robot stop until there is no more obstacle. 
+
+# :dancer: Groupie
+
+## :memo: FSM
 
 ![Finite-State Machine of the PAMI groupie.](/images/FSM-PAMI-Groupie.png)
 
+## Sensors
+
+- **Infrared (IR) Sensors**  
+    Used for line-following and distinguishing between black and white surfaces. Placed at the front of the robot, they allow it to follow a line on the ground or detect nearby obstacles.
+
+- **Optical Fork Sensors (Encoders)**  
+    Each wheel is equipped with a slotted disk attached to the motor shaft and an optical fork sensor that detects interruptions of the infrared beam caused by the slots. For every detected interruption, a pulse is generated on a microcontroller's digital input. This allows the robot to repeat the same movements on both wheels, improving synchronization and control.
+
+- **Distance Sensor (Ultrasonic)**  
+    Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
+
+## Strategy
+
+### Line Following
+
+The robot follows a black line on a light surface using the IR sensors. By analyzing the left/right sensor signals, it adjusts its trajectory to stay centered on the line.
+
+### Obstacle Avoidance
+
+When an obstacle is detected by the distance sensor, the robot interrupts line following and performs an avoidance maneuver based on a simple algorithm (stop, turn, go forwoard, turn).
 
 # :deciduous_tree: Tree Structure
 
