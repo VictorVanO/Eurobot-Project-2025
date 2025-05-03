@@ -31,7 +31,6 @@ void setup() {
 void loop() {
     if (!demarrageAutorise) {
         if (tirette.estActivee()) {
-            Serial.println("Tirette activée, démarrage autorisé !");
             demarrageAutorise = true;
             if (useBlue) {
                 fsmBleu.autoriserDemarrage();  
@@ -40,13 +39,11 @@ void loop() {
             }
 
         } else {
-            Serial.println("En attente de la tirette...");
             delay(200);
             return;
         }
     }
 
-    // FSM active uniquement après la tirette
     if (useBlue) {
         fsmBleu.run();
     } else {
