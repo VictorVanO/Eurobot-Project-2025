@@ -14,7 +14,7 @@ void FSM_jaune::autoriserDemarrage() {
 
 
 FSM_jaune::FSM_jaune() {
-    state = IDLE;  // État initial
+    state = IDLE; 
 }
 
 
@@ -23,7 +23,6 @@ void FSM_jaune::init() {
     initMotors();  
     initUltrasonic();
     initEncoders();
-    //initServoLed();
     motorSpeed =70;
     setMotorsSpeed(motorSpeed);
     state = IDLE; 
