@@ -12,15 +12,15 @@ void FSM_jaune::autoriserDemarrage() {
     globalTimer = millis();
 }
 
-// Constructeur
+
 FSM_jaune::FSM_jaune() {
     state = IDLE;  // État initial
 }
 
-// Initialisation de la FSM
+
 void FSM_jaune::init() {
     Serial.begin(9600);
-    initMotors();  // Initialiser les moteurs
+    initMotors();  
     initUltrasonic();
     initEncoders();
     //initServoLed();
@@ -34,26 +34,17 @@ void FSM_jaune::init() {
 
 }
 
-// Exécution de la FSM
+
 void FSM_jaune::run() {
     handleState();
     updateEncoders();
 }
 
-// Gestion de l'état
+
 void FSM_jaune::handleState() {
 
-    long distance1 = getDistance(1); // Distance du capteur 1
-    long distance2 = getDistance(2); // Distance du capteur 2
-    // Serial.println(distance1);
-    // Serial.println(distance2);
-
-
-    
-    // Serial.print("Ticks G : ");
-    // Serial.print(getLeftCount());
-    // Serial.print(" | D : ");
-    // Serial.println(getRightCount());
+    long distance1 = getDistance(1); 
+    long distance2 = getDistance(2);
 
     if (millis() - globalTimer >= 100000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
@@ -82,7 +73,6 @@ void FSM_jaune::handleState() {
                 
     switch (state) {
         case IDLE:
-            //  Serial.println("État : IDLE");
             stopMotors();
             if (millis() - startTime >= 87000){
                 state = FOLLOW_LINE_STATE;
@@ -92,15 +82,15 @@ void FSM_jaune::handleState() {
 
             case FOLLOW_LINE_STATE:
 
-                //if (distance1 <= 4 || distance2 <= 4) {
-                    //state = AWAIT_OBSTACLE_STATE;
-                //}
-                //if (millis() - startTime >= 11000){
-                        //while(millis() - startTime<13000){
-                            //turnRight();
-                            //goForward();
-                        //}
-                    //}
+                if (distance1 <= 4 || distance2 <= 4) {
+                    state = AWAIT_OBSTACLE_STATE;
+                }
+                if (millis() - startTime >= 11000){
+                        while(millis() - startTime<13000){
+                            turnRight();
+                            goForward();
+                        }
+                    }
                 
         
                 switch (returnDirection()) {
@@ -120,7 +110,6 @@ void FSM_jaune::handleState() {
                 break;
 
         case AWAIT_OBSTACLE_STATE:
-            // Serial.println("État : Avoid");
 
             stopMotors();
 
@@ -131,11 +120,10 @@ void FSM_jaune::handleState() {
                 state = FOLLOW_LINE_STATE;
             }
 
-            //evitementObstacle();
+            evitementObstacle();
             break;
 
         case WAIT_CLEAR_STATE:
-            // Serial.println("État : clear");
 
             stopMotors();
             long d1 = getDistance(1);
@@ -172,7 +160,6 @@ void FSM_jaune::handleState() {
 }
 
 void FSM_jaune::evitementObstacle() {
-    // Serial.println("Evittement");
     resetCounts();
     turnLeft();
 
