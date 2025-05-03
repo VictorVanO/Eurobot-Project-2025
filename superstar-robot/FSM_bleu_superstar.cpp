@@ -2,22 +2,22 @@
 
 void FSM_bleu::autoriserDemarrage() {
     demarrageAutorise = true;
-    startTime = millis();     // Lancer les timers ici, proprement
+    startTime = millis();     
     globalTimer = millis();
     obstacleStart = millis();
     obstacleTotalTime = 0;
 }
 
-// Constructeur
+// Constructor
 FSM_bleu::FSM_bleu() {
-    state = IDLE;  // État initial
+    state = IDLE; 
 }
 
-// Initialisation de la FSM
+// FSM
 void FSM_bleu::init() {
     Serial.begin(9600);
     Serial.println("FSM initialisée");
-    initMotors();  // Initialiser les moteurs
+    initMotors();  
     initUltrasonic();
     initServoLed();
     motorSpeed = 90;
@@ -32,12 +32,11 @@ void FSM_bleu::init() {
     obstacleTotalTime = 0;
 }
 
-// Exécution de la FSM
+// Execute the FSM
 void FSM_bleu::run() {
     handleState(); 
 }
 
-// Gestion de l'état
 void FSM_bleu::handleState() {
     if (!demarrageAutorise) {
         Serial.println("En attente de la tirette...");
@@ -45,8 +44,8 @@ void FSM_bleu::handleState() {
         return;
     }
     
-    long distance1 = getDistance(1); // Distance du capteur 1
-    long distance2 = getDistance(2); // Distance du capteur 2
+    long distance1 = getDistance(1); 
+    long distance2 = getDistance(2);
 
     Serial.print("Distance mesurée : ");
     Serial.print(distance1);
