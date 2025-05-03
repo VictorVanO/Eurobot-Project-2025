@@ -89,28 +89,25 @@ This is the schematic circuit of the big robot :
  
 ![Schematic wiring of the big robot](/images/Schematic_Wiring-Big-Robot.png)
 
-## Arms
 
-The Big Robot features a deployable structure equipped with two arms on top of the robot, each fitted with a gripper. These arms are used to place the banner and move the stands to the designated area.
+## Grippers
+The Big Robot is now equipped with 2 independent grippers, each controlled by a servo motor and mounted on a dedicated gripper support.
+Each gripper holds one end of a tube, and each tube is attached to a banner holder shaped to fit the edge of the match table.
+The banner itself measures 60 cm in length and 25 cm in height.
 
-In the ```3D-Models/big-robot``` folder, you’ll find the STL files for the arm. The table below lists the different files with the total number of times each one needs to be printed to assemble both arms:
+<p align="center">
+  <img src="/images/Model-Banner-Big-Robot-1.png" alt="Model Banner Step 1" width="300" height="287"/>
+  <img src="/images/Model-Banner-Big-Robot-2.png" alt="Model Banner Step 2" width="300"/>
+</p>
 
-| STL File          | Description                                  | Required Quantity |
-|-------------------|----------------------------------------------|-------------------|
-| base-part-1.stl   | Part n°1 of the arm base                     | 2                 |
-| base-part-2.stl   | Part n°2 of the arm base                     | 2                 |
-| base-part-3.stl   | Part n°3 of the arm base                     | 2                 |
-| base-bolt         | Bolt used to attach the arm to the base      | 2                 |
-| arm-1.stl         | 1st segment of the robotic arm               | 2                 |
-| arm-2.stl         | 2nd segment of the robotic arm               | 2                 |
-| gear-x3.stl       | Gear for the whole arm                       | 6                 |
-| arm-hub.stl       | 1st connector between base and 2nd arm joint | 2                 |
-| main-axle.stl     | 2nd connector between base and 2nd arm joint | 2                 |
-| middle-gear.stl   | Gear responsible for the arm movement        | 2                 |
-| middle-axle.stl   | Axis allowing the arm rotation               | 2                 |
-| clamp.stl         | Clamp to hold objects                        | 2                 |
+During deployment, the robot releases the 1st tube, allowing the 1st banner holder to drop and clip into the table edge.
+Then, the robot moves forward about 20 cm and releases the 2nd tube, completing the deployment of the banner.
 
-For this arm, we based our design on an existing project, which you can find via this [video](https://www.youtube.com/watch?v=YqrbWCVa3xA), including assembly instructions for the arm.
+In the ```3D-Models/big-robot``` folder, you’ll find the STL file for the gripper support. This part needs to be printed twice — once for each gripper:
+
+| STL File            | Required Quantity |
+|---------------------|-------------------|
+| gripper-support.stl | 2                 |
 
 # PAMI
 
