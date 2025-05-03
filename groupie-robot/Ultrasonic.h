@@ -3,10 +3,10 @@
 
 #include "Arduino.h"
 
-#define TRIG_PIN_1 9  // Pin TRIG du HC-SR04
-#define ECHO_PIN_1 10 // Pin ECHO du HC-SR04
-#define ECHO_PIN_2 7 // Pin ECHO du HC-SR04
-#define TRIG_PIN_2 8  // Pin TRIG du HC-SR04
+#define TRIG_PIN_1 9 
+#define ECHO_PIN_1 10 
+#define ECHO_PIN_2 7 
+#define TRIG_PIN_2 8  
 
 
 void initUltrasonic();
