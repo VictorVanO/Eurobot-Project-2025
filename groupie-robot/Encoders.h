@@ -7,7 +7,7 @@
 #define RIGHT_ENCODER_PIN 2
 
 void initEncoders();
-void updateEncoders(); // à appeler à chaque boucle
+void updateEncoders(); 
 long getLeftCount();
 long getRightCount();
 void resetCounts();
