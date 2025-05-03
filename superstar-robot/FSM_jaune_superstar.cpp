@@ -2,22 +2,22 @@
 
 void FSM_jaune::autoriserDemarrage() {
     demarrageAutorise = true;
-    startTime = millis();     // Lancer les timers ici, proprement
+    startTime = millis();    
     globalTimer = millis();
     obstacleStart = millis();
     obstacleTotalTime = 0;
 }
 
-// Constructeur
+// Constructor
 FSM_jaune::FSM_jaune() {
-    state = IDLE;  // État initial
+    state = IDLE; 
 }
 
-// Initialisation de la FSM
+// FSM
 void FSM_jaune::init() {
     Serial.begin(9600);
     Serial.println("FSM initialisée");
-    initMotors();  // Initialiser les moteurs
+    initMotors();  
     initUltrasonic();
     initServoLed();
     motorSpeed = 90;
@@ -28,12 +28,12 @@ void FSM_jaune::init() {
     state = IDLE; 
 }
 
-// Exécution de la FSM
+// Execute the FSM
 void FSM_jaune::run() {
     handleState(); 
 }
 
-// Gestion de l'état
+
 void FSM_jaune::handleState() {
     digitalWrite(ledPin, LOW);
     if (!demarrageAutorise) {
@@ -42,8 +42,8 @@ void FSM_jaune::handleState() {
         return;
     }
     
-    long distance1 = getDistance(1); // Distance du capteur 1
-    long distance2 = getDistance(2); // Distance du capteur 2
+    long distance1 = getDistance(1); 
+    long distance2 = getDistance(2); 
 
     Serial.print("Distance mesurée : ");
     Serial.print(distance1);
