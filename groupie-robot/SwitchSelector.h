@@ -7,7 +7,7 @@ class ModeSelector {
 public:
     ModeSelector(int pin);
     void begin();
-    bool isPrimaryMode(); // true si position vers FSM actuelle
+    bool isPrimaryMode();
 
 private:
     int switchPin;
