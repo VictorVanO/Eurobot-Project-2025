@@ -1,11 +1,10 @@
 #include "Encoders.h"
 
 
-// Variables de comptage
 long leftCount = 0;
 long rightCount = 0;
 
-// État précédent pour détection de front montant
+
 int lastLeftState = LOW;
 int lastRightState = LOW;
 
@@ -28,7 +27,7 @@ void updateEncoders() {
         rightCount++;
     }
 
-    // Mémorisation des états actuels
+    
     lastLeftState = currentLeft;
     lastRightState = currentRight;
 }
