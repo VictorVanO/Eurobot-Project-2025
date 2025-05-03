@@ -12,15 +12,15 @@ void FSM_bleu::autoriserDemarrage() {
     globalTimer = millis();
 }
 
-// Constructeur
+// Constructor
 FSM_bleu::FSM_bleu() {
-    state = IDLE;  // État initial
+    state = IDLE; 
 }
 
-// Initialisation de la FSM
+
 void FSM_bleu::init() {
     Serial.begin(9600);
-    initMotors();  // Initialiser les moteurs
+    initMotors(); 
     initUltrasonic();
     initEncoders();
     motorSpeed =65;
@@ -32,27 +32,19 @@ void FSM_bleu::init() {
     digitalWrite(ledPin, LOW);
 }
 
-// Exécution de la FSM
+
 void FSM_bleu::run() {
     handleState();
     updateEncoders();
 }
 
-// Gestion de l'état
+
 void FSM_bleu::handleState() {
     
     
-    long distance1 = getDistance(1); // Distance du capteur 1
-    long distance2 = getDistance(2); // Distance du capteur 2
-    // Serial.println(distance1);
-    // Serial.println(distance2);
+    long distance1 = getDistance(1); 
+    long distance2 = getDistance(2); 
 
-
-    
-    // Serial.print("Ticks G : ");
-    // Serial.print(getLeftCount());
-    // Serial.print(" | D : ");
-    // Serial.println(getRightCount());
 
     if (millis() - globalTimer >= 20000 && state != PARTY_STATE) {
         Serial.println("Temps écoulé ! Arrêt complet.");
@@ -82,7 +74,6 @@ void FSM_bleu::handleState() {
                 
     switch (state) {
         case IDLE:
-            //  Serial.println("État : IDLE");
             stopMotors();
             if (millis() - startTime >= 5000){
                 state = FOLLOW_LINE_STATE;
@@ -120,7 +111,6 @@ void FSM_bleu::handleState() {
                 break;
 
         case AWAIT_OBSTACLE_STATE:
-            // Serial.println("État : Avoid");
 
             stopMotors();
 
@@ -147,7 +137,7 @@ void FSM_bleu::handleState() {
                     delay(400);
         
                     resetCounts();
-                    turnLeft();  // 🔄 Inversé par rapport à jaune
+                    turnLeft(); 
                     while (getLeftCount() < ticksRotation) {
                         updateEncoders();
                     }
