@@ -5,9 +5,9 @@ ModeSelector::ModeSelector(int pin) {
 }
 
 void ModeSelector::begin() {
-    pinMode(switchPin, INPUT_PULLUP); // suppose une position reliée à GND et l’autre à 5V
+    pinMode(switchPin, INPUT_PULLUP); 
 }
 
 bool ModeSelector::isPrimaryMode() {
-    return digitalRead(switchPin) == HIGH; // HIGH = FSM actuelle, LOW = autre mode
+    return digitalRead(switchPin) == HIGH;
 }
