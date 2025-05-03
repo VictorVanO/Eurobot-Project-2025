@@ -25,6 +25,6 @@ long getDistance(int sensor) {
     digitalWrite(trigPin, LOW);
 
     long duration = pulseIn(echoPin, HIGH);
-    long distance = duration * 0.034 / 2; // Conversion en cm
+    long distance = duration * 0.034 / 2; // Conversion in cm
     return distance;
 }
