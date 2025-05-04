@@ -77,15 +77,19 @@ Here are the main components for our robot :
 - 1 x Starting Magnetic Reed
    
 ## Strategy
-The Big Robot should be able to do 2 actions in order to score points : 
-1. The robot should deposit the banner using the 2 arm, one for each π-shaped support.
-2. The arms should rotate around the robot and be placed up front
-3. The robot moves to take the first construction in front
-4. The robot grips the construction, lifts it using the 2 arms and places it on the side
-5. The robot makes a 180° turn
-6. The robot moves to the second construction and lifts it using the arms
-7. The robot places the second construction on the starting zone
-8. The robot makes a 180° turn and goes to the final construction zone
+The Big Robot is designed to perform a specific sequence of actions to score points during the match:
+
+1. **Banner Deployment :**  
+   The robot starts by deploying the banner. The first gripper releases its tube, allowing the first banner holder to drop and clip into the edge of the table. Then, the robot moves forward by about 20 cm, and the second gripper releases the second tube, completing the deployment of the banner.
+
+2. **Repositioning :**  
+   After the banner is fully deployed, the robot reverses and begins its path toward the arrival zone, stopping right in front of it.
+
+3. **Timed Entry :**  
+   The robot waits until approximately the 85th second, allowing the 2 PAMI robots to clear the area.
+
+4. **Final Movement :**  
+   As soon as the area is clear, the Big Robot enters the arrival zone to secure end-of-match points.
 
 ## Schematic wiring
 
