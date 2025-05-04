@@ -37,6 +37,11 @@ Anyone willing to replicate our robots should be able to do so using this reposi
 
 Every file we used for our robots are listed here, aswell as the components and the schematics.
 
+ Below is a photo of our robots (1 Big robot and 2 PAMI units):
+ <p align="center">
+    <img src="/images/Robots-Photo.jpg" alt="Photo Robots" width="600"/>
+ </p>
+
 ## :exclamation: Prerequesites
 
 To use our codes, you will need:
