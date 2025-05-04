@@ -1,56 +1,60 @@
-#include "FSM_jaune.h"
+#include "FSM_Yellow.h"
 #include <Servo.h>
 
-const int ledPin =13;
+const int ledPin = 13;
+
+// Obstacle avoidance step states
 const int AVOID_NONE = 0;
 const int AVOID_TURN_LEFT_DONE = 1;
 const int AVOID_COMPLETED = 2;
 
-void FSM_jaune::autoriserDemarrage() {
-    demarrageAutorise = true;
+// Authorize FSM to start
+void FSM_Yellow::authorizeStart() {
+    startAuthorized = true;
     startTime = millis();
     globalTimer = millis();
 }
 
-
-FSM_jaune::FSM_jaune() {
-    state = IDLE; 
+// Constructor
+FSM_Yellow::FSM_Yellow() {
+    state = IDLE;
 }
 
-
-void FSM_jaune::init() {
+// Initialization function
+void FSM_Yellow::init() {
     Serial.begin(9600);
-    initMotors();  
+    initMotors();
     initUltrasonic();
     initEncoders();
-    motorSpeed =70;
+    motorSpeed = 70;
     setMotorsSpeed(motorSpeed);
-    state = IDLE; 
+    state = IDLE;
     startTime = millis();
     globalTimer = millis();
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, LOW);
-
 }
 
-
-void FSM_jaune::run() {
+// Main FSM execution loop
+void FSM_Yellow::run() {
     handleState();
     updateEncoders();
 }
 
-
-void FSM_jaune::handleState() {
-
-    long distance1 = getDistance(1); 
+// Handles FSM state logic
+void FSM_Yellow::handleState() {
+    long distance1 = getDistance(1);
     long distance2 = getDistance(2);
 
+    // Stop everything and enter PARTY_STATE after 100 seconds
     if (millis() - globalTimer >= 100000 && state != PARTY_STATE) {
-        Serial.println("Temps écoulé ! Arrêt complet.");
-        stopMotors();        
+        Serial.println("Time's up! Shutting down.");
+        stopMotors();
         unsigned long start = millis();
         Servo servo;
         servo.attach(4);
+
+        // Party loop: servo oscillation + LED blinking
         while (millis() - start < 87000) {
             stopMotors();
             for (int angle = 0; angle <= 90; angle++) {
@@ -69,73 +73,68 @@ void FSM_jaune::handleState() {
         state = PARTY_STATE;
     }
 
-                
     switch (state) {
         case IDLE:
             stopMotors();
-            if (millis() - startTime >= 87000){
+            if (millis() - startTime >= 87000) {
                 state = FOLLOW_LINE_STATE;
                 startTime = millis();
             }
             break;
 
-            case FOLLOW_LINE_STATE:
+        case FOLLOW_LINE_STATE:
+            if (distance1 <= 4 || distance2 <= 4) {
+                state = AWAIT_OBSTACLE_STATE;
+            }
 
-                if (distance1 <= 4 || distance2 <= 4) {
-                    state = AWAIT_OBSTACLE_STATE;
+            if (millis() - startTime >= 11000) {
+                while (millis() - startTime < 13000) {
+                    turnRight();
+                    goForward();
                 }
-                if (millis() - startTime >= 11000){
-                        while(millis() - startTime<13000){
-                            turnRight();
-                            goForward();
-                        }
-                    }
-                
-        
-                switch (returnDirection()) {
-                    case 0:
-                      goForward();
-                      break;
-                    case 1:
-                      turnLeft();
-                      break;
-                    case 2:
-                      turnRight();
-                      break;
-                    case 3:
-                      goForward();
-                      break;
-                }
-                break;
+            }
+
+            switch (returnDirection()) {
+                case 0:
+                    goForward();
+                    break;
+                case 1:
+                    turnLeft();
+                    break;
+                case 2:
+                    turnRight();
+                    break;
+                case 3:
+                    goForward();
+                    break;
+            }
+            break;
 
         case AWAIT_OBSTACLE_STATE:
-
             stopMotors();
 
             distance1 = getDistance(1);
             distance2 = getDistance(2);
 
-            if (distance1 >= 4 && distance2 >= 4) {  
+            if (distance1 >= 4 && distance2 >= 4) {
                 state = FOLLOW_LINE_STATE;
             }
 
-            evitementObstacle();
+            obstacleAvoidance();
             break;
 
         case WAIT_CLEAR_STATE:
-
             stopMotors();
             long d1 = getDistance(1);
             long d2 = getDistance(2);
-        
+
             if (d1 > 9 && d2 > 9) {
-        
                 if (avoidStep == AVOID_TURN_LEFT_DONE) {
                     goForward();
                     delay(600);
                     stopMotors();
                     delay(400);
-        
+
                     resetCounts();
                     turnRight();
                     while (getRightCount() < ticksRotation) {
@@ -144,26 +143,26 @@ void FSM_jaune::handleState() {
                     stopMotors();
                     delay(300);
                 }
-        
+
                 avoidStep = AVOID_COMPLETED;
                 state = FOLLOW_LINE_STATE;
             }
             break;
-        
-        case PARTY_STATE: 
-            Serial.println("Party time !");
+
+        case PARTY_STATE:
+            Serial.println("Party time!");
             stopMotors();
             break;
-            
     }
 }
 
-void FSM_jaune::evitementObstacle() {
+// Handles obstacle avoidance routine
+void FSM_Yellow::obstacleAvoidance() {
     resetCounts();
     turnLeft();
 
-    const long ticksCible = 16; 
-    while (getLeftCount() < ticksCible) {
+    const long targetTicks = 16;
+    while (getLeftCount() < targetTicks) {
         updateEncoders();
     }
     stopMotors();
@@ -175,7 +174,7 @@ void FSM_jaune::evitementObstacle() {
     long d3 = getDistance(1);
     long d4 = getDistance(2);
     if (d3 < 9 || d4 < 9) {
-        state = WAIT_CLEAR_STATE;  
+        state = WAIT_CLEAR_STATE;
         return;
     }
 
@@ -183,10 +182,9 @@ void FSM_jaune::evitementObstacle() {
     delay(600);
     stopMotors();
     delay(400);
-    
+
     resetCounts();
     turnRight();
-
     while (getRightCount() < ticksRotation) {
         updateEncoders();
     }

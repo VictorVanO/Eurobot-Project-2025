@@ -13,6 +13,7 @@ void initBluetooth() {
     Serial.begin(9600);     // Initialize Serial Monitor communication
 }
 
+
 // Function to send a message via Bluetooth
 void sendMessage(String newDirection) {
     String message = "New direction: ";

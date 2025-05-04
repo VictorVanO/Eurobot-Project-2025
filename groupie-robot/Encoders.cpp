@@ -17,12 +17,12 @@ void updateEncoders() {
     int currentLeft = digitalRead(LEFT_ENCODER_PIN);
     int currentRight = digitalRead(RIGHT_ENCODER_PIN);
 
-    // Détection de front montant gauche
+    
     if (currentLeft == HIGH && lastLeftState == LOW) {
         leftCount++;
     }
 
-    // Détection de front montant droite
+    
     if (currentRight == HIGH && lastRightState == LOW) {
         rightCount++;
     }

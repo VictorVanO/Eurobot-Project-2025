@@ -7,7 +7,6 @@
 extern const byte rxPin;
 extern const byte txPin;
 
-// Function declarations
 void initBluetooth();
 void sendMessage(String newDirection);
 

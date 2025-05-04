@@ -1,54 +1,67 @@
-#include "FSM_jaune.h"  
-#include "FSM_bleu.h"       
+#include "FSM_Yellow.h"   // Finite State Machine for the yellow configuration
+#include "FSM_Blue.h"     // Finite State Machine for the blue configuration
 
+// Pin used to determine the robot's mode (yellow or blue)
 const int modeSwitchPin = 12;
 ModeSelector selector(modeSwitchPin);
 
-const int tirettePin = 11;
-Tirette tirette(tirettePin); 
+// Pin connected to the physical pull trigger (formerly "tirette")
+const int pullPin = 11;
+PullPin pullTrigger(pullPin);  // Manages start signal
 
-FSM_jaune fsmJaune;
-FSM_bleu fsmBleu;
+// FSM instances
+FSM_Yellow fsmYellow;
+FSM_Blue fsmBlue;
 
-bool demarrageAutorise = false;
-bool useBlue = false;
+// Flags to track system state
+bool startAuthorized = false;  // Indicates if the robot is allowed to start
+bool useBlue = false;          // Determines whether to run the blue FSM or the yellow FSM
 
 void setup() {
     Serial.begin(9600);
+
+    // Initialize selector and pull trigger hardware
     selector.begin();
-    tirette.begin();
+    pullTrigger.begin();
+
+    // Determine mode based on the selector state
     if (selector.isPrimaryMode()) {
-        Serial.println("FSM_bleu");
+        Serial.println("FSM_Blue selected");
         useBlue = true;
-        fsmJaune.init(); 
+        fsmBlue.init();  // Initialize the blue FSM
     } else {
-        Serial.println("FSM_jaune");
+        Serial.println("FSM_Yellow selected");
         useBlue = false;
-        fsmJaune.init();  
+        fsmYellow.init();  // Initialize the yellow FSM
     }
 }
 
 void loop() {
-    if (!demarrageAutorise) {
-        if (tirette.estActivee()) {
-            demarrageAutorise = true;
-            if (useBlue) {
-                fsmBleu.autoriserDemarrage();  
-            } else {
-                fsmJaune.autoriserDemarrage(); 
-            }
+    // Wait for the pull trigger to be activated before starting
+    if (!startAuthorized) {
+        if (pullTrigger.isActivated()) {
+            startAuthorized = true;
 
+            // Notify the selected FSM to begin
+            if (useBlue) {
+                fsmBlue.authorizeStart();
+            } else {
+                fsmYellow.authorizeStart();
+            }
         } else {
+            // Wait and check again later
             delay(200);
             return;
         }
     }
 
+    // Run the appropriate FSM
     if (useBlue) {
-        fsmBleu.run();
+        fsmBlue.run();
     } else {
-        fsmJaune.run();
+        fsmYellow.run();
     }
 
+    // Small delay to avoid overloading the loop
     delay(100);
 }

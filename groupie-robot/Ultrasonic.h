@@ -8,7 +8,6 @@
 #define ECHO_PIN_2 7 
 #define TRIG_PIN_2 8  
 
-
 void initUltrasonic();
 long getDistance(int sensor);
 

@@ -6,7 +6,6 @@ void initInfrared() {
     pinMode(RIGHT_IR_SENSOR, INPUT); 
 }
 
-
 int returnDirection() {
   int leftIR = digitalRead(LEFT_IR_SENSOR);   // 1 = black
   int rightIR = digitalRead(RIGHT_IR_SENSOR); // 1 = black

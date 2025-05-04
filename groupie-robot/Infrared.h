@@ -9,4 +9,5 @@ const int RIGHT_IR_SENSOR = 5;
 void initInfrared();
 int returnDirection();
 
+
 #endif
