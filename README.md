@@ -54,17 +54,12 @@ You will also need to install these arduino libraries:
 # :car: Big Robot
 
 ## 🧩 Bloc Diagram
-The Bloc diagram below shows the main components of the Big robot and how they are connected together :
+The Bloc diagram below shows the main components of the Big robot and how they are connected together.
 ![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Big-Robot.png)
 
 ## :memo: FSM
 
-The initial FSM for our big robot was looking like this:
-
-![Finite-State Machine of the big robot.](/images/FSM-Big-Robot-init.png)
-
-Due to a lack of time and components, our final FSM ended up like this:
-
+The FSM diagram illustrates the different states of the Big robot and how it transitions between them during a match.
 ![Finite-State Machine of the big robot.](/images/FSM-Big-Robot-final.png)
 
 ## :wrench: Components
