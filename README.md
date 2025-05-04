@@ -144,6 +144,20 @@ The Bloc diagram below shows the main components of the Superstar and how they a
     Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
 
 ## Strategy
+In order to score points the Superstar should be able to : 
+1. The robot climbs the ramp by moving straight for 6 seconds at full speed.
+2. It then turns right for 1.5 seconds to align itself as close as possible to the edge of the platform to maximize scoring potential.
+3. It drives forward briefly to stabilize or adjust its final position.
+4. Enter PARTY_STATE to celebrate the arrival. In this state, the robot rotates its servo motor arms back and forth and blinks the LED lights to provide a visual and animated signal.
+   
+## Obstacle Avoidance
+When an obstacle is detected by the distance sensor, the robot stop until there is no more obstacle. 
+
+## Schematic wiring
+
+This is the schematic circuit of the superstar :
+
+![Schematic wiring of the Superstar robot](/images/Schematic_Superstar.png)
 
 ### Obstacle Avoidance
 When an obstacle is detected by the distance sensor, the robot stop until there is no more obstacle. 
@@ -179,12 +193,18 @@ The Bloc diagram below shows the main components of the Groupie and how they are
     Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
 
 ## Strategy
+In order to score points the groupie should be able to : 
+1. Follow a line to reach the arrival zone. The robot follows a black line on a light surface using IR sensors. By analyzing the left/right sensor signals, it adjusts its trajectory to stay centered on the line.
+2. Enter PARTY_STATE to celebrate the arrival. In this state, the robot rotates its servo motor arms back and forth and blinks the LED lights to provide a visual and animated signal.
 
-### Line Following
+## Schematic wiring
 
-The robot follows a black line on a light surface using the IR sensors. By analyzing the left/right sensor signals, it adjusts its trajectory to stay centered on the line.
+This is the schematic circuit of the groupie :
 
-### Obstacle Avoidance
+![Schematic wiring of the Groupie robot](/images/Schematic_Groupie.png)
+
+
+## Obstacle Avoidance
 
 When an obstacle is detected by the distance sensor, the robot interrupts line following and performs an avoidance maneuver based on a simple algorithm (stop, turn, go forwoard, turn).
 
