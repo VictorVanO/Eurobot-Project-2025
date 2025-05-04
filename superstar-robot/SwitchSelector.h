@@ -12,5 +12,6 @@ private:
     int switchPin;
 };
 
+
 #endif
 

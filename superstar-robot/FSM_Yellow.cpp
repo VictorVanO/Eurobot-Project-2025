@@ -1,96 +1,100 @@
-#include "FSM_bleu_superstar.h"
+#include "FSM_Yellow.h"
 
-void FSM_bleu::autoriserDemarrage() {
-    demarrageAutorise = true;
-    startTime = millis();     
+// Trigger the FSM start when the pull-pin is removed
+void FSM_Yellow::authorizeStart() {
+    startAuthorized = true;
+    startTime = millis();    
     globalTimer = millis();
     obstacleStart = millis();
     obstacleTotalTime = 0;
 }
 
 // Constructor
-FSM_bleu::FSM_bleu() {
-    state = IDLE; 
+FSM_Yellow::FSM_Yellow() {
+    state = IDLE;
 }
 
-// FSM
-void FSM_bleu::init() {
+// Initialize all components and FSM state
+void FSM_Yellow::init() {
     Serial.begin(9600);
-    Serial.println("FSM initialisée");
+    Serial.println("FSM initialized");
+
     initMotors();  
     initUltrasonic();
     initServoLed();
+
     motorSpeed = 90;
     motorSpeed1 = 55;
     motorSpeed2 = 50;
-    
+
     setMotorsSpeed(motorSpeed);
-    state = IDLE; 
-    startTime = millis();
-    globalTimer = millis();
-    obstacleStart = millis();
-    obstacleTotalTime = 0;
+    state = IDLE;
 }
 
-// Execute the FSM
-void FSM_bleu::run() {
-    handleState(); 
+// Main execution loop for the FSM
+void FSM_Yellow::run() {
+    handleState();
 }
 
-void FSM_bleu::handleState() {
-    if (!demarrageAutorise) {
-        Serial.println("En attente de la tirette...");
+// Core FSM logic based on current state
+void FSM_Yellow::handleState() {
+    digitalWrite(ledPin, LOW);
+
+    if (!startAuthorized) {
+        Serial.println("Waiting for pull-pin...");
         stopMotors();
         return;
     }
-    
-    long distance1 = getDistance(1); 
+
+    long distance1 = getDistance(1);
     long distance2 = getDistance(2);
 
-    Serial.print("Distance mesurée : ");
+    Serial.print("Distance 1: ");
     Serial.print(distance1);
     Serial.println(" cm");
 
-    Serial.print("Distance mesurée : ");
+    Serial.print("Distance 2: ");
     Serial.print(distance2);
     Serial.println(" cm");
 
+    // Automatically stop after 100 seconds
     if (millis() - globalTimer >= 100000 && state != PARTY_STATE) {
-        Serial.println("Temps écoulé ! Arrêt complet.");
+        Serial.println("Time limit reached. Stopping...");
         state = PARTY_STATE;
     }
 
     switch (state) {
         case IDLE:
-            Serial.println("État : IDLE");
+            Serial.println("State: IDLE");
             stopMotors();
-            if (millis() - startTime >= 5000){
-              state = MOVE_FORWARD_STATE;
-              startTime = millis();
+            if (millis() - startTime >= 87000) {
+                state = MOVE_FORWARD_STATE;
+                startTime = millis();
             }
             break;
 
         case MOVE_FORWARD_STATE:
             if (millis() - startTime - obstacleTotalTime < 6000) {
-                Serial.println("État : AVANCER");
+                Serial.println("State: MOVE FORWARD");
                 goForward();
             } 
             else if (millis() - startTime - obstacleTotalTime < 7500) {
-                Serial.println("État : TOURNER À DROITE");
+                Serial.println("State: TURN RIGHT");
                 setMotorsSpeed(motorSpeed1);
-                turnLeft();
+                turnRight();
             } 
             else if (millis() - startTime - obstacleTotalTime <= 8000) {
-                Serial.println("État : REPARTIR TOUT DROIT");
+                Serial.println("State: STRAIGHT AGAIN");
                 goForward();
                 setMotorsSpeed(motorSpeed2);
-            }
+            } 
             else {
-                Serial.println("Fin de la séquence");
+                Serial.println("End of movement sequence");
                 state = PARTY_STATE;
             }
-              
-            if (distance1 < 7 || distance2 < 7) { 
+
+            // Check for obstacle
+            if (distance1 < 7 || distance2 < 7) {
                 obstacleStart = millis();
                 state = AWAIT_OBSTACLE_STATE;
             }
@@ -99,14 +103,14 @@ void FSM_bleu::handleState() {
         case AWAIT_OBSTACLE_STATE:
             stopMotors();
             delay(500);
-            if (distance1 >= 7 && distance2 >= 7) {  
+            if (distance1 >= 7 && distance2 >= 7) {
                 obstacleTotalTime += (millis() - obstacleStart);
                 state = MOVE_FORWARD_STATE;
             }
             break;
-        
+
         case PARTY_STATE:
-            Serial.println("Party time !");
+            Serial.println("Party time!");
             stopMotors();
             party();
             break;

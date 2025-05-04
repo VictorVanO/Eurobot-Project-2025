@@ -3,7 +3,6 @@
 #include <Servo.h>
 
 Servo myServo;
-
 const int durationParty = 500000;  
 unsigned long partyStartTime;     
 

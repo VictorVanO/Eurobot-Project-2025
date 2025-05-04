@@ -4,6 +4,7 @@ ModeSelector::ModeSelector(int pin) {
     switchPin = pin;
 }
 
+
 void ModeSelector::begin() {
     pinMode(switchPin, INPUT_PULLUP); 
 

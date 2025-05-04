@@ -1,58 +1,59 @@
-#include "FSM_jaune_superstar.h"  
-#include "FSM_bleu_superstar.h"       
+#include "FSM_Yellow.h"
+#include "FSM_Blue.h"
 
 const int modeSwitchPin = 3;
 ModeSelector selector(modeSwitchPin);
 
-const int tirettePin = 4;
-Tirette tirette(tirettePin); 
+const int pullPin = 4;
+PullPin pullTrigger(pullPin);  
 
-FSM_jaune fsmJaune;
-FSM_bleu fsmBleu;
+FSM_Yellow fsmYellow;
+FSM_Blue fsmBlue;
 
-bool demarrageAutorise = false;
+bool startAuthorized = false;
 bool useBlue = false;
 
 void setup() {
     Serial.begin(9600);
+
     selector.begin();
-    tirette.begin();
+    pullTrigger.begin();
+
     if (selector.isPrimaryMode()) {
-        Serial.println("FSM_bleu");
+        Serial.println("FSM_Blue selected");
         useBlue = true;
-        fsmBleu.init(); 
+        fsmBlue.init();
     } else {
-        Serial.println("FSM_jaune");
+        Serial.println("FSM_Yellow selected");
         useBlue = false;
-        fsmJaune.init();  
+        fsmYellow.init();
     }
 }
 
 void loop() {
-    if (!demarrageAutorise) {
-        if (!tirette.estActivee()) {
-            demarrageAutorise = true;
+    // Wait for pull-pin to be removed before starting
+    if (!startAuthorized) {
+        if (!pullTrigger.isActivated()) {  // Logic stays the same (LOW = not pulled)
+            startAuthorized = true;
 
             if (useBlue) {
-                fsmBleu.autoriserDemarrage();  
+                fsmBlue.authorizeStart();
             } else {
-                fsmJaune.autoriserDemarrage(); 
+                fsmYellow.authorizeStart();
             }
 
         } else {
-        
             delay(200);
             return;
         }
     }
 
-   
+    // Run the appropriate FSM
     if (useBlue) {
-        fsmBleu.run();
+        fsmBlue.run();
     } else {
-        fsmJaune.run();
+        fsmYellow.run();
     }
 
     delay(100);
 }
-

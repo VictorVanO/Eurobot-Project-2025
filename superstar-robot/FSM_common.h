@@ -1,6 +1,7 @@
 #ifndef FSM_COMMON_H
 #define FSM_COMMON_H
 
+
 enum RobotState {
     IDLE,             
     MOVE_FORWARD_STATE,  
