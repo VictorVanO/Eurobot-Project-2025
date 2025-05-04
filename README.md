@@ -134,7 +134,12 @@ In the ```3D-Models/big-robot``` folder, you’ll find the STL file for the grip
 
 # :star2: Superstar
 
-## :memo: Superstar FSM
+## 🧩 Bloc Diagram
+The Bloc diagram below shows the main components of the Superstar and how they are connected together :
+![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Superstar.png)
+
+
+## :memo: FSM
 
 ![Finite-State Machine of the PAMI superstar.](/images/FSM-PAMI-Superstar.png)
 
@@ -158,6 +163,10 @@ When an obstacle is detected by the distance sensor, the robot stop until there 
 - With two M3 screws and nuts fix the battery support to the lower plate
 
 # :dancer: Groupie
+
+## 🧩 Bloc Diagram
+The Bloc diagram below shows the main components of the Groupie and how they are connected together :
+![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Groupie.png)
 
 ## :memo: FSM
 
