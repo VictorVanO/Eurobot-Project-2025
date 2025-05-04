@@ -37,6 +37,11 @@ Anyone willing to replicate our robots should be able to do so using this reposi
 
 Every file we used for our robots are listed here, aswell as the components and the schematics.
 
+ Below is a photo of our robots (1 Big robot and 2 PAMI units):
+ <p align="center">
+    <img src="/images/Robots-Photo.jpg" alt="Photo Robots" width="600"/>
+ </p>
+
 ## :exclamation: Prerequesites
 
 To use our codes, you will need:
@@ -48,9 +53,12 @@ You will also need to install these arduino libraries:
 
 # :car: Big Robot
 
+## 🧩 Bloc Diagram
+The Bloc diagram below shows the main components of the Big robot and how they are connected together.
+![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Big-Robot.png)
+
 ## :memo: FSM
 
-![Finite-State Machine of the big robot.](/images/FSM-Big-Robot-init.png)
 
 Our [initial FSM][fsm-big-robot-init] was ambitious, but due to a lack of time and components, our final FSM ended up like this:
 
@@ -71,15 +79,19 @@ Here are the main components for our robot :
 - 1 x Starting Magnetic Reed
    
 ## Strategy
-The Big Robot should be able to do 2 actions in order to score points : 
-1. The robot should deposit the banner using the 2 arm, one for each π-shaped support.
-2. The arms should rotate around the robot and be placed up front
-3. The robot moves to take the first construction in front
-4. The robot grips the construction, lifts it using the 2 arms and places it on the side
-5. The robot makes a 180° turn
-6. The robot moves to the second construction and lifts it using the arms
-7. The robot places the second construction on the starting zone
-8. The robot makes a 180° turn and goes to the final construction zone
+The Big Robot is designed to perform a specific sequence of actions to score points during the match:
+
+1. **Banner Deployment :**  
+   The robot starts by deploying the banner. The first gripper releases its tube, allowing the first banner holder to drop and clip into the edge of the table. Then, the robot moves forward by about 20 cm, and the second gripper releases the second tube, completing the deployment of the banner.
+
+2. **Repositioning :**  
+   After the banner is fully deployed, the robot reverses and begins its path toward the arrival zone, stopping right in front of it.
+
+3. **Timed Entry :**  
+   The robot waits until approximately the 85th second, allowing the 2 PAMI robots to clear the area.
+
+4. **Final Movement :**  
+   As soon as the area is clear, the Big Robot enters the arrival zone to secure end-of-match points.
 
 ## Schematic wiring
 
@@ -123,7 +135,12 @@ In the ```3D-Models/big-robot``` folder, you’ll find the STL file for the grip
 
 # :star2: Superstar
 
-## :memo: Superstar FSM
+## 🧩 Bloc Diagram
+The Bloc diagram below shows the main components of the Superstar and how they are connected together :
+![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Superstar.png)
+
+
+## :memo: FSM
 
 ![Finite-State Machine of the PAMI superstar.](/images/FSM-PAMI-Superstar.png)
 
@@ -133,6 +150,20 @@ In the ```3D-Models/big-robot``` folder, you’ll find the STL file for the grip
     Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
 
 ## Strategy
+In order to score points the Superstar should be able to : 
+1. The robot climbs the ramp by moving straight for 6 seconds at full speed.
+2. It then turns right for 1.5 seconds to align itself as close as possible to the edge of the platform to maximize scoring potential.
+3. It drives forward briefly to stabilize or adjust its final position.
+4. Enter PARTY_STATE to celebrate the arrival. In this state, the robot rotates its servo motor arms back and forth and blinks the LED lights to provide a visual and animated signal.
+   
+## Obstacle Avoidance
+When an obstacle is detected by the distance sensor, the robot stop until there is no more obstacle. 
+
+## Schematic wiring
+
+This is the schematic circuit of the superstar :
+
+![Schematic wiring of the Superstar robot](/images/Schematic_Superstar.png)
 
 ### Obstacle Avoidance
 When an obstacle is detected by the distance sensor, the robot stop until there is no more obstacle. 
@@ -147,6 +178,10 @@ When an obstacle is detected by the distance sensor, the robot stop until there 
 - With two M3 screws and nuts fix the battery support to the lower plate
 
 # :dancer: Groupie
+
+## 🧩 Bloc Diagram
+The Bloc diagram below shows the main components of the Groupie and how they are connected together :
+![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Groupie.png)
 
 ## :memo: FSM
 
@@ -164,12 +199,18 @@ When an obstacle is detected by the distance sensor, the robot stop until there 
     Detects obstacles from a distance to enable automatic avoidance and spatial orientation.
 
 ## Strategy
+In order to score points the groupie should be able to : 
+1. Follow a line to reach the arrival zone. The robot follows a black line on a light surface using IR sensors. By analyzing the left/right sensor signals, it adjusts its trajectory to stay centered on the line.
+2. Enter PARTY_STATE to celebrate the arrival. In this state, the robot rotates its servo motor arms back and forth and blinks the LED lights to provide a visual and animated signal.
 
-### Line Following
+## Schematic wiring
 
-The robot follows a black line on a light surface using the IR sensors. By analyzing the left/right sensor signals, it adjusts its trajectory to stay centered on the line.
+This is the schematic circuit of the groupie :
 
-### Obstacle Avoidance
+![Schematic wiring of the Groupie robot](/images/Schematic_Groupie.png)
+
+
+## Obstacle Avoidance
 
 When an obstacle is detected by the distance sensor, the robot interrupts line following and performs an avoidance maneuver based on a simple algorithm (stop, turn, go forwoard, turn).
 
