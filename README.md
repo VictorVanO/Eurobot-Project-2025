@@ -59,7 +59,9 @@ The Bloc diagram below shows the main components of the Big robot and how they a
 
 ## :memo: FSM
 
-The FSM diagram illustrates the different states of the Big robot and how it transitions between them during a match.
+
+Our [initial FSM][fsm-big-robot-init] was ambitious, but due to a lack of time and components, our final FSM ended up like this:
+
 ![Finite-State Machine of the big robot.](/images/FSM-Big-Robot-final.png)
 
 ## :wrench: Components
@@ -225,6 +227,15 @@ When an obstacle is detected by the distance sensor, the robot interrupts line f
 
 ```bash
 Eurobot-Project-2025
+    ├── 3D-models
+       ├── big-robot
+       ├── groupie-robot
+       └── superstar-robot
+    ├── big-robot
+    ├── groupie-robot
+    ├── images
+    ├── superstar-robot
+    ├── .gitignore
     ├── LICENSE
     └── README.md
 ```
@@ -233,3 +244,4 @@ Eurobot-Project-2025
 [eurobot]: https://www.eurobot.org/
 [eurobot-rules]: https://www.eurobot.org/eurobot-contest/eurobot-2025/
 [arduino]: https://www.arduino.cc/en/software/
+[fsm-big-robot-init]: https://github.com/VictorVanO/Eurobot-Project-2025/blob/main/images/FSM-Big-Robot-init.png
