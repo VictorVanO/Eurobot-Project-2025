@@ -53,6 +53,10 @@ You will also need to install these arduino libraries:
 
 # :car: Big Robot
 
+## 🧩 Bloc Diagram
+The Bloc diagram below shows the main components of the Big robot and how they are connected together :
+![Bloc Diagram of the big robot.](/images/Bloc-Diagram-Big-Robot.png)
+
 ## :memo: FSM
 
 The initial FSM for our big robot was looking like this:
